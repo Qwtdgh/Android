@@ -111,15 +111,15 @@ class _DishInfoPage extends StatelessWidget {
               // verticalDirection: Ver,
               children: [
                 Text(
-                  '菜品名称:\t' + data.dishName,
+                  '名称：\t' + data.dishName,
                   style: textStyle,
                 ),
                 Text(
-                  '食堂:\t\t\t\t\t\t\t\t' + data.dishPlace,
+                  '食堂：\t' + data.dishPlace,
                   style: textStyle,
                 ),
                 Text(
-                  '价格:\t\t\t\t\t\t\t\t' + data.dishPrice.toDouble().toStringAsFixed(2),
+                  '价格：\t' + data.dishPrice.toDouble().toStringAsFixed(2),
                   style: textStyle,
                 ),
               ],

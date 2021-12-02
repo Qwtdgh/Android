@@ -24,7 +24,8 @@ class _Canteen_Root extends StatelessWidget {
     canteenImgUrl:
     'https://img1.baidu.com/it/u=2263776819,1940511170&fm=26&fmt=auto',
     canteenName: '合一食堂',
-    comments: ['Great', 'Garbage', 'Huge', 'Huge', 'Huge', 'Huge', 'Huge', 'Huge', 'Huge', 'Huge', 'Huge', 'Huge', 'Huge', 'Huge', 'Huge', 'Huge', 'Huge', 'Huge', 'Huge', 'Huge'],
+    canteenAddr: '校园北路',
+    canteenTel: '010-82638192',
   );
 
   @override
@@ -132,12 +133,16 @@ class CanteenInfo {
   // dish name
   final String canteenName;
 
+  // canteen addr
+  final String canteenAddr;
+
   // dish comments
-  final List<String> comments;
+  final String canteenTel;
 
   const CanteenInfo({
     required this.canteenImgUrl,
     required this.canteenName,
-    required this.comments,
+    required this.canteenAddr,
+    required this.canteenTel,
   });
 }

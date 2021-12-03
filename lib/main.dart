@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:smooth_star_rating/smooth_star_rating.dart';
 import 'package:flutter/cupertino.dart';
 import 'dart:convert' as Convert;
+import 'package:badges/badges.dart';
 
 part 'dishes_display.dart';
 part 'dish_display.dart';
@@ -12,6 +13,7 @@ part 'order.dart';
 part 'canteen.dart';
 part 'canteen_display.dart';
 part 'order_get.dart';
+part 'user.dart';
 
 void main() => runApp(const MyApp());
 
@@ -64,10 +66,11 @@ class _BottomSelectionState extends State<_BottomSelection> {
         style: optionStyle,
       ),*/
       _OrderGetPage(),
-      const Text(
+      /*const Text(
         'Index 4: My',
         style: optionStyle,
-      ),
+      ),*/
+      _UserPage(),
     ];
   }
 

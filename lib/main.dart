@@ -11,6 +11,7 @@ part 'dish_display.dart';
 part 'order.dart';
 part 'canteen.dart';
 part 'canteen_display.dart';
+part 'order_get.dart';
 
 void main() => runApp(const MyApp());
 
@@ -62,7 +63,7 @@ class _BottomSelectionState extends State<_BottomSelection> {
         'Index 3: Order',
         style: optionStyle,
       ),*/
-      _OrderPage(),
+      _OrderGetPage(),
       const Text(
         'Index 4: My',
         style: optionStyle,

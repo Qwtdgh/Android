@@ -125,7 +125,7 @@ class _Order_Get_List_State extends State<_Order_Get_List> {
                                 shadowColor: Colors.red,
                                 fixedSize: const Size.fromHeight(10)),
                             child: const Text(
-                              '已送达',
+                              '接单',
                               style: TextStyle(fontSize: 15.0),
                             ),
                             onPressed: () {

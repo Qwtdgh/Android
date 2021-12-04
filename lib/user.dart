@@ -16,8 +16,8 @@ class _UserPage extends StatelessWidget {
       routes: {
         "/": (context) => Myself(),
         "/personalInfo": (context) => PersonalInfo(),
-        "/sendOrder": (context) => _Order_SendRoute(this.userID),
-        "/receiveOrder": (context) => _Order_ReceiveRoute(this.userID),
+        "/sendOrder": (context, {arguments}) => _Order_SendRoute(),
+        "/receiveOrder": (context, {arguments}) => _Order_ReceiveRoute(),
         "/wallet": (context) => Wallet(),
       },
     );
@@ -232,7 +232,7 @@ class Myself extends StatelessWidget {
                       children: <Widget>[
                         IconButton(
                           onPressed: () {
-                            Navigator.pushNamed(context, "/sendOrder");
+                            Navigator.pushNamed(context, "/sendOrder", arguments: 1);
                           },
                           icon: Icon(
                             Icons.local_grocery_store_outlined,
@@ -478,20 +478,13 @@ List<Item> generateItems(int numberOfItems) {
 // }
 
 class MyList extends StatefulWidget {
-  late int userID;
-  MyList(int userID) {
-    this.userID = userID;
-  }
+
 
   @override
-  createState() => MyListState(this.userID);
+  createState() => MyListState();
 }
 
 class MyListState extends State<MyList> {
-  late int userID;
-  MyListState(int userID) {
-    this.userID = userID;
-  }
 
   List<Map<String, String>> sends = [
     {"id": "1", "d": "kk", "rp": "receiver", "time": "11/31"},
@@ -610,10 +603,7 @@ class MyListState extends State<MyList> {
 }
 
 class _Order_SendRoute extends StatelessWidget {
-  late int userID;
-  _Order_SendRoute(int userID) {
-    this.userID = userID;
-  }
+
 
   @override
   Widget build(BuildContext context) {
@@ -625,135 +615,140 @@ class _Order_SendRoute extends StatelessWidget {
         shadowColor: Colors.yellow,
       ),
       backgroundColor: const Color.fromARGB(255, 239, 239, 239),
-      body: MyList(this.userID),
+      body: MyList(),
     );
   }
 }
 
 class ExpansionList extends StatefulWidget {
-  late int userID;
-  ExpansionList(int userID) {
-    this.userID = userID;
-  }
 
+  late List receiveOrders = [];
+  
+  ExpansionList(List receiveOrders) {
+    this.receiveOrders = receiveOrders;  
+  }
+  
   @override
   State createState() {
-    return ExpansionListState(this.userID);
+    return ExpansionListState(this.receiveOrders);
   }
 }
 
 class ExpansionListState extends State<ExpansionList> {
-
-  late int userID;
-  ExpansionListState(int userID) {
-    this.userID = userID;
+  
+  late List receiveOrders = [];
+  
+  ExpansionListState(List receiveOrders) {
+    this.receiveOrders = receiveOrders;
   }
 
-  final List<Map<String, String>> _receiveInfo = [
-    {
-      "time": "11-30",
-      "shop": "食堂",
-      "foodname": "炒饭",
-      "foodprice": "88",
-      "delivername": "李明",
-      "phone": "13833615605",
-      "isExpanded": "0"
-    },
-    {
-      "time": "11-30",
-      "shop": "食堂",
-      "foodname": "炒饭",
-      "foodprice": "88",
-      "delivername": "李明",
-      "phone": "13833615605",
-      "isExpanded": "0"
-    },
-    {
-      "time": "11-30",
-      "shop": "食堂",
-      "foodname": "炒饭",
-      "foodprice": "88",
-      "delivername": "李明",
-      "phone": "13833615605",
-      "isExpanded": "0"
-    },
-    {
-      "time": "11-30",
-      "shop": "食堂",
-      "foodname": "炒饭",
-      "foodprice": "88",
-      "delivername": "李明",
-      "phone": "13833615605",
-      "isExpanded": "0"
-    },
-    {
-      "time": "11-30",
-      "shop": "食堂",
-      "foodname": "炒饭",
-      "foodprice": "88",
-      "delivername": "李明",
-      "phone": "13833615605",
-      "isExpanded": "0"
-    },
-    {
-      "time": "11-30",
-      "shop": "食堂",
-      "foodname": "炒饭",
-      "foodprice": "88",
-      "delivername": "李明",
-      "phone": "13833615605",
-      "isExpanded": "0"
-    },
-    {
-      "time": "11-30",
-      "shop": "食堂",
-      "foodname": "炒饭",
-      "foodprice": "88",
-      "delivername": "李明",
-      "phone": "13833615605",
-      "isExpanded": "0"
-    },
-    {
-      "time": "11-30",
-      "shop": "食堂",
-      "foodname": "炒饭",
-      "foodprice": "88",
-      "delivername": "李明",
-      "phone": "13833615605",
-      "isExpanded": "0"
-    },
-    {
-      "time": "11-30",
-      "shop": "食堂",
-      "foodname": "炒饭",
-      "foodprice": "88",
-      "delivername": "李明",
-      "phone": "13833615605",
-      "isExpanded": "0"
-    },
-    {
-      "time": "11-30",
-      "shop": "食堂",
-      "foodname": "炒饭",
-      "foodprice": "88",
-      "delivername": "李明",
-      "phone": "13833615605",
-      "isExpanded": "0"
-    },
-    {
-      "time": "11-30",
-      "shop": "食堂",
-      "foodname": "炒饭",
-      "foodprice": "88",
-      "delivername": "李明",
-      "phone": "13833615605",
-      "isExpanded": "0"
-    },
-  ];
+  // final List<Map<String, String>> receiveOrders = [
+  //   {
+  //     "time": "11-30",
+  //     "shop": "食堂",
+  //     "foodname": "炒饭",
+  //     "foodprice": "88",
+  //     "delivername": "李明",
+  //     "phone": "13833615605",
+  //     "isExpanded": "0"
+  //   },
+  //   {
+  //     "time": "11-30",
+  //     "shop": "食堂",
+  //     "foodname": "炒饭",
+  //     "foodprice": "88",
+  //     "delivername": "李明",
+  //     "phone": "13833615605",
+  //     "isExpanded": "0"
+  //   },
+  //   {
+  //     "time": "11-30",
+  //     "shop": "食堂",
+  //     "foodname": "炒饭",
+  //     "foodprice": "88",
+  //     "delivername": "李明",
+  //     "phone": "13833615605",
+  //     "isExpanded": "0"
+  //   },
+  //   {
+  //     "time": "11-30",
+  //     "shop": "食堂",
+  //     "foodname": "炒饭",
+  //     "foodprice": "88",
+  //     "delivername": "李明",
+  //     "phone": "13833615605",
+  //     "isExpanded": "0"
+  //   },
+  //   {
+  //     "time": "11-30",
+  //     "shop": "食堂",
+  //     "foodname": "炒饭",
+  //     "foodprice": "88",
+  //     "delivername": "李明",
+  //     "phone": "13833615605",
+  //     "isExpanded": "0"
+  //   },
+  //   {
+  //     "time": "11-30",
+  //     "shop": "食堂",
+  //     "foodname": "炒饭",
+  //     "foodprice": "88",
+  //     "delivername": "李明",
+  //     "phone": "13833615605",
+  //     "isExpanded": "0"
+  //   },
+  //   {
+  //     "time": "11-30",
+  //     "shop": "食堂",
+  //     "foodname": "炒饭",
+  //     "foodprice": "88",
+  //     "delivername": "李明",
+  //     "phone": "13833615605",
+  //     "isExpanded": "0"
+  //   },
+  //   {
+  //     "time": "11-30",
+  //     "shop": "食堂",
+  //     "foodname": "炒饭",
+  //     "foodprice": "88",
+  //     "delivername": "李明",
+  //     "phone": "13833615605",
+  //     "isExpanded": "0"
+  //   },
+  //   {
+  //     "time": "11-30",
+  //     "shop": "食堂",
+  //     "foodname": "炒饭",
+  //     "foodprice": "88",
+  //     "delivername": "李明",
+  //     "phone": "13833615605",
+  //     "isExpanded": "0"
+  //   },
+  //   {
+  //     "time": "11-30",
+  //     "shop": "食堂",
+  //     "foodname": "炒饭",
+  //     "foodprice": "88",
+  //     "delivername": "李明",
+  //     "phone": "13833615605",
+  //     "isExpanded": "0"
+  //   },
+  //   {
+  //     "time": "11-30",
+  //     "shop": "食堂",
+  //     "foodname": "炒饭",
+  //     "foodprice": "88",
+  //     "delivername": "李明",
+  //     "phone": "13833615605",
+  //     "isExpanded": "0"
+  //   },
+  // ];
   final List<int> mlist = [1, 2, 3];
+
 
   @override
   Widget build(BuildContext context) {
+
     Widget _header(item) {
       return SizedBox(
         height: 20.0,
@@ -822,7 +817,7 @@ class ExpansionListState extends State<ExpansionList> {
               child: ElevatedButton(
                 onPressed: () {
                   setState(() {
-                    _receiveInfo.removeAt(_receiveInfo.indexOf(item));
+                    receiveOrders.removeAt(receiveOrders.indexOf(item));
                   });
                 },
                 child: const Text('已收到'),
@@ -835,14 +830,14 @@ class ExpansionListState extends State<ExpansionList> {
       return ExpansionPanelList(
         expansionCallback: (int index, bool isExpanded) {
           setState(() {
-            if (_receiveInfo[index]["isExpanded"] == "0") {
-              _receiveInfo[index]["isExpanded"] = "1";
+            if (receiveOrders[index]["isExpanded"] == "0") {
+              receiveOrders[index]["isExpanded"] = "1";
             } else {
-              _receiveInfo[index]["isExpanded"] = "0";
+              receiveOrders[index]["isExpanded"] = "0";
             }
           });
         },
-        children: _receiveInfo.map((item) {
+        children: receiveOrders.map((item) {
           return ExpansionPanel(
             headerBuilder: (BuildContext context, bool isExpanded) {
               return _header(item);
@@ -874,18 +869,17 @@ class ExpansionListState extends State<ExpansionList> {
 }
 
 class _Order_ReceiveRoute extends StatelessWidget {
-  late int userID;
-  _Order_ReceiveRoute(int userID) {
-    this.userID = userID;
-  }
+
+  late List receiveOrders = [];
 
   @override
   Widget build(BuildContext context) {
+    receiveOrders = ModalRoute.of(context)!.settings.arguments as List;
     return Scaffold(
       appBar: AppBar(
         title: const Text("收餐"),
       ),
-      body: Center(child: ExpansionList(this.userID)),
+      body: Center(child: ExpansionList(receiveOrders)),
     );
   }
 }

@@ -1,5 +1,7 @@
 library main;
 
+import 'package:delivery/widgets/snackbar.dart';
+
 import 'http.dart';
 import 'package:flutter/material.dart';
 import 'package:smooth_star_rating/smooth_star_rating.dart';
@@ -16,6 +18,8 @@ part 'canteen_display.dart';
 part 'order_get.dart';
 part 'user.dart';
 part 'cart.dart';
+
+
 
 //void main() => runApp(const MyApp());
 

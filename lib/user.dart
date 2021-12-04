@@ -2,6 +2,7 @@ part of main;
 
 class _UserPage extends StatelessWidget {
   late int userID;
+
   _UserPage(int userID) {
     this.userID = userID;
   }
@@ -10,11 +11,11 @@ class _UserPage extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       theme: ThemeData(
-      primarySwatch: Colors.yellow,
+        primarySwatch: Colors.yellow,
       ),
       initialRoute: "/",
       routes: {
-        "/": (context) => Myself(),
+        "/": (context) => Myself(this.userID),
         "/personalInfo": (context) => PersonalInfo(),
         "/sendOrder": (context, {arguments}) => _Order_SendRoute(),
         "/receiveOrder": (context, {arguments}) => _Order_ReceiveRoute(),
@@ -24,19 +25,327 @@ class _UserPage extends StatelessWidget {
   }
 }
 
-class Myself extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text("Myself"),
-      ),
-      backgroundColor: Color(0xfff7c341),
-      body: _listView(context),
-    );
+class MyselfListState extends State<MyselfList> {
+  late int userID = -1;
+  late String userNickname = "";
+  late String userAddress = "";
+  late String userTel = "";
+  late List sendOrders = [];
+  late List receiveOrders = [];
+
+  MyselfListState(int userID) {
+    this.userID = userID;
   }
 
-  ListView _listView(BuildContext context) {
+  getAll(BuildContext context) async {
+    // CustomSnackBar(context, const Text('Login button pressed'));
+
+    var baseUrl = "http://delivery.mcatk.com";
+    var uri = "/api/getInformation/";
+    var body = {"userID": this.userID.toString()};
+    http.Response response = await http.post(Uri.parse(baseUrl + uri), body: Convert.jsonEncode(body));
+    final statusCode = response.statusCode;
+    final responseBody = response.body;
+    var result = Convert.jsonDecode(responseBody);
+    print('[uri=$uri][statusCode=$statusCode][response=$responseBody]');
+
+    //var http =  HttpRequest("http://delivery.mcatk.com");
+
+    //Map<String, String> ret = http.post("/api/login/", body) as Map<String, String>;
+    //String? userID = ret["userID"];
+    var userID = result["userID"];
+    print(userID);
+    setState(() {
+      this.userNickname = result["userNickName"];
+      this.userAddress = result["userAddress"];
+      this.userTel = result["userTel"];
+      this.receiveOrders = result["userOrders"];
+      this.sendOrders = result["userDeliveryOrders"];
+    });
+    // Navigator.pushNamed(context, "/main", arguments: userID);
+  }
+
+  @override
+  Widget build(BuildContext context) {
+
+    getAll(context);
+
+    Card _normalCard() {
+      return Card(
+        color: Colors.white, // 背景色
+        // shadowColor: Colors.white, // 阴影颜色
+        // elevation: 20, // 阴影高度
+        //borderOnForeground: false, // 是否在 child 前绘制 border，默认为 true
+        margin: EdgeInsets.fromLTRB(0, 50, 0, 30), // 外边距
+
+        //Text("Noraml Card", style: TextStyle(color: Colors.white),),
+
+        child: Container(
+            width: 300,
+            height: 100,
+            // alignment: Alignment.center,
+            child: Row(
+                mainAxisAlignment: MainAxisAlignment.start,
+                crossAxisAlignment: CrossAxisAlignment.center,
+                // textBaseline: TextBaseline.alphabetic,
+                children: <Widget>[
+                  // CircleAvatar(
+                  //   // 宽高不一致为，裁剪后为椭圆形
+                  //   child: Container(
+                  //     height: 100,
+                  //     width: 150,
+                  //     child: Image.asset(
+                  //       "images/login/login_logo.png",
+                  //       fit: BoxFit.cover,
+                  //     ),
+                  //   ),
+                  // ),
+
+                  Container(
+                      width: 100,
+                      height: 100,
+                      child: Image.asset("images/login/login_logo.png")),
+                  Text('${this.userNickname}'),
+                ])),
+      );
+    }
+
+    Card _shapeCard(BuildContext context, String str, String route) {
+      return Card(
+        color: Colors.white, // 背景色
+        // shadowColor: Colors.white, // 阴影颜色
+        // elevation: 20, // 阴影高度
+        borderOnForeground: false, // 是否在 child 前绘制 border，默认为 true
+        //margin: EdgeInsets.fromLTRB(0, 50, 0, 30), // 外边距
+
+        // 边框
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(40),
+          side: BorderSide(
+            color: Colors.white,
+            width: 3,
+          ),
+        ),
+
+        child: Container(
+            width: 300,
+            height: 250,
+            alignment: Alignment.center,
+            //child: Text(str, style: TextStyle(color: Colors.white),),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              children: <Widget>[
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  children: <Widget>[
+                    Icon(
+                      Icons.account_box,
+                      size: 32.0,
+                    ),
+                    Text('${this.userNickname}')
+                  ],
+                ),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  children: <Widget>[
+                    Icon(
+                      Icons.home,
+                      size: 32.0,
+                    ),
+                    Text('${this.userAddress}')
+                  ],
+                ),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  children: <Widget>[
+                    Icon(
+                      Icons.phone,
+                      size: 32.0,
+                    ),
+                    Text('${this.userTel}')
+                  ],
+                ),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  children: <Widget>[
+                    IconButton(
+                      onPressed: () {
+                        //修改信息部分
+                        //需要调用修改信息的函数
+                        Navigator.pushNamed(context, route);
+                      },
+                      icon: Icon(
+                        Icons.star,
+                        size: 32.0,
+                      ),
+                    ),
+                  ],
+                ),
+              ],
+            )),
+      );
+    }
+
+    Card _shapeCard0(BuildContext context, String str, String route) {
+      return Card(
+        color: Colors.white, // 背景色
+        // shadowColor: Colors.white, // 阴影颜色
+        // elevation: 20, // 阴影高度
+        borderOnForeground: false, // 是否在 child 前绘制 border，默认为 true
+        //margin: EdgeInsets.fromLTRB(0, 50, 0, 30), // 外边距
+
+        // 边框
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(40),
+          side: BorderSide(
+            color: Colors.white,
+            width: 3,
+          ),
+        ),
+
+        child: Container(
+            width: 300,
+            height: 130,
+            alignment: Alignment.center,
+            //child: Text(str, style: TextStyle(color: Colors.white),),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              children: <Widget>[
+                Badge(
+                  //文本内容Text为空时子组件为null时则返回一个红点，其他值时按实际显示
+                  badgeContent: Text(""),
+                  child: Container(
+                      height: 80,
+                      width: 40,
+                      child: Column(
+                        children: <Widget>[
+                          IconButton(
+                            onPressed: () {
+                              Navigator.pushNamed(context, "/sendOrder", arguments: 1);
+                            },
+                            icon: Icon(
+                              Icons.local_grocery_store_outlined,
+                              size: 32.0,
+                            ),
+                          ),
+                          Text(
+                            "待配送",
+                            style: new TextStyle(
+                              fontFamily: "Ewert",
+                              fontSize: 12,
+                            ),
+                            softWrap: false,
+                            textAlign: TextAlign.center,
+                          ),
+                        ],
+                      )),
+                  //子组件
+                  badgeColor: Colors.red,
+                  //右上角小红点颜色（默认时为红色）
+                  showBadge: true,
+                  //true时刷新时会在右则摆动一下
+                  animationDuration: Duration(seconds: 10),
+                  //小点点在右侧摆动的时间,这里为10秒
+                  toAnimate: true, //允许摆动，false时showBadge会失效
+                ),
+
+                // Badge(
+                //   //文本内容Text为空时子组件为null时则返回一个红点，其他值时按实际显示
+                //   badgeContent:Text(""),
+                //   child: Text("待收货"), //子组件
+                //   badgeColor: Colors.red,  //右上角小红点颜色（默认时为红色）
+                //   showBadge: true,//true时刷新时会在右则摆动一下
+                //   animationDuration:Duration(seconds: 10),//小点点在右侧摆动的时间,这里为10秒
+                //   toAnimate:true, //允许摆动，false时showBadge会失效
+                //
+                // ),
+                Badge(
+                  //文本内容Text为空时子组件为null时则返回一个红点，其他值时按实际显示
+                  badgeContent: Text(""),
+                  child: Container(
+                      height: 80,
+                      width: 40,
+                      child: Column(
+                        children: <Widget>[
+                          IconButton(
+                            onPressed: () {
+                              Navigator.pushNamed(context, "/receiveOrder");
+                            },
+                            icon: Icon(
+                              Icons.people,
+                              size: 32.0,
+                            ),
+                          ),
+                          Text(
+                            "待收货",
+                            style: new TextStyle(
+                              fontFamily: "Ewert",
+                              fontSize: 12,
+                            ),
+                            softWrap: false,
+                          )
+                        ],
+                      )),
+                  //子组件
+                  badgeColor: Colors.red,
+                  //右上角小红点颜色（默认时为红色）
+                  showBadge: true,
+                  //true时刷新时会在右则摆动一下
+                  animationDuration: Duration(seconds: 10),
+                  //小点点在右侧摆动的时间,这里为10秒
+                  toAnimate: true, //允许摆动，false时showBadge会失效
+                ),
+                Badge(
+                  //文本内容Text为空时子组件为null时则返回一个红点，其他值时按实际显示
+                  badgeContent: Text(""),
+                  child: Container(
+                      height: 80,
+                      width: 40,
+                      child: Column(
+                        children: <Widget>[
+                          IconButton(
+                            onPressed: () {
+                              Navigator.pushNamed(context, "/receiveOrder");
+                            },
+                            icon: Icon(
+                              Icons.star,
+                              size: 32.0,
+                            ),
+                          ),
+                          Text(
+                            "收藏",
+                            style: new TextStyle(
+                              fontFamily: "Ewert",
+                              fontSize: 12,
+                            ),
+                            softWrap: false,
+                          ),
+                        ],
+                      )),
+                  //子组件
+                  badgeColor: Colors.red,
+                  //右上角小红点颜色（默认时为红色）
+                  showBadge: true,
+                  //true时刷新时会在右则摆动一下
+                  animationDuration: Duration(seconds: 10),
+                  //小点点在右侧摆动的时间,这里为10秒
+                  toAnimate: true, //允许摆动，false时showBadge会失效
+                ),
+                // Badge(
+                //   //文本内容Text为空时子组件为null时则返回一个红点，其他值时按实际显示
+                //   badgeContent:Text(""),
+                //   child: Text("待配送"), //子组件
+                //   badgeColor: Colors.red,  //右上角小红点颜色（默认时为红色）
+                //   showBadge: true,//true时刷新时会在右则摆动一下
+                //   animationDuration:Duration(seconds: 10),//小点点在右侧摆动的时间,这里为10秒
+                //   toAnimate:true, //允许摆动，false时showBadge会失效
+                //
+                // ),
+              ],
+            )),
+      );
+    }
+
     return ListView(
       // mainAxisAlignment: MainAxisAlignment.center,
       // crossAxisAlignment: CrossAxisAlignment.center,
@@ -82,278 +391,35 @@ class Myself extends StatelessWidget {
       ],
     );
   }
+}
 
-  Card _normalCard() {
-    return Card(
-      color: Colors.white, // 背景色
-      // shadowColor: Colors.white, // 阴影颜色
-      // elevation: 20, // 阴影高度
-      //borderOnForeground: false, // 是否在 child 前绘制 border，默认为 true
-      margin: EdgeInsets.fromLTRB(0, 50, 0, 30), // 外边距
+class MyselfList extends StatefulWidget {
+  late int userID = -1;
 
-      //Text("Noraml Card", style: TextStyle(color: Colors.white),),
+  MyselfList(int userID) {
+    this.userID = userID;
+}
 
-      child: Container(
-          width: 300,
-          height: 100,
-          // alignment: Alignment.center,
-          child: Row(
-              mainAxisAlignment: MainAxisAlignment.start,
-              crossAxisAlignment: CrossAxisAlignment.center,
-              // textBaseline: TextBaseline.alphabetic,
-              children: <Widget>[
-                // CircleAvatar(
-                //   // 宽高不一致为，裁剪后为椭圆形
-                //   child: Container(
-                //     height: 100,
-                //     width: 150,
-                //     child: Image.asset(
-                //       "images/login/login_logo.png",
-                //       fit: BoxFit.cover,
-                //     ),
-                //   ),
-                // ),
+  @override
+  createState() => MyselfListState(this.userID);
+}
 
-                Container(
-                    width: 100,
-                    height: 100,
-                    child: Image.asset("images/login/login_logo.png")),
-                Text("用户昵称"),
-              ])),
-    );
+class Myself extends StatelessWidget {
+  late int userID;
+
+  Myself(int userID) {
+    this.userID = userID;
   }
 
-  Card _shapeCard(BuildContext context, String str, String route) {
-    return Card(
-      color: Colors.white, // 背景色
-      // shadowColor: Colors.white, // 阴影颜色
-      // elevation: 20, // 阴影高度
-      borderOnForeground: false, // 是否在 child 前绘制 border，默认为 true
-      //margin: EdgeInsets.fromLTRB(0, 50, 0, 30), // 外边距
 
-      // 边框
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(40),
-        side: BorderSide(
-          color: Colors.white,
-          width: 3,
-        ),
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: Text("Myself"),
       ),
-
-      child: Container(
-          width: 300,
-          height: 250,
-          alignment: Alignment.center,
-          //child: Text(str, style: TextStyle(color: Colors.white),),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-            children: <Widget>[
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                children: <Widget>[
-                  Icon(
-                    Icons.account_box,
-                    size: 32.0,
-                  ),
-                  Text("zzh")
-                ],
-              ),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                children: <Widget>[
-                  Icon(
-                    Icons.home,
-                    size: 32.0,
-                  ),
-                  Text("地址")
-                ],
-              ),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                children: <Widget>[
-                  Icon(
-                    Icons.phone,
-                    size: 32.0,
-                  ),
-                  Text("电话")
-                ],
-              ),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                children: <Widget>[
-                  IconButton(
-                    onPressed: () {
-                      Navigator.pushNamed(context, route);
-                    },
-                    icon: Icon(
-                      Icons.star,
-                      size: 32.0,
-                    ),
-                  ),
-                ],
-              ),
-            ],
-          )),
-    );
-  }
-
-  Card _shapeCard0(BuildContext context, String str, String route) {
-    return Card(
-      color: Colors.white, // 背景色
-      // shadowColor: Colors.white, // 阴影颜色
-      // elevation: 20, // 阴影高度
-      borderOnForeground: false, // 是否在 child 前绘制 border，默认为 true
-      //margin: EdgeInsets.fromLTRB(0, 50, 0, 30), // 外边距
-
-      // 边框
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(40),
-        side: BorderSide(
-          color: Colors.white,
-          width: 3,
-        ),
-      ),
-
-      child: Container(
-          width: 300,
-          height: 130,
-          alignment: Alignment.center,
-          //child: Text(str, style: TextStyle(color: Colors.white),),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-            children: <Widget>[
-              Badge(
-                //文本内容Text为空时子组件为null时则返回一个红点，其他值时按实际显示
-                badgeContent: Text(""),
-                child: Container(
-                    height: 80,
-                    width: 40,
-                    child: Column(
-                      children: <Widget>[
-                        IconButton(
-                          onPressed: () {
-                            Navigator.pushNamed(context, "/sendOrder", arguments: 1);
-                          },
-                          icon: Icon(
-                            Icons.local_grocery_store_outlined,
-                            size: 32.0,
-                          ),
-                        ),
-                        Text(
-                          "待配送",
-                          style: new TextStyle(
-                            fontFamily: "Ewert",
-                            fontSize: 12,
-                          ),
-                          softWrap: false,
-                          textAlign: TextAlign.center,
-                        ),
-                      ],
-                    )),
-                //子组件
-                badgeColor: Colors.red,
-                //右上角小红点颜色（默认时为红色）
-                showBadge: true,
-                //true时刷新时会在右则摆动一下
-                animationDuration: Duration(seconds: 10),
-                //小点点在右侧摆动的时间,这里为10秒
-                toAnimate: true, //允许摆动，false时showBadge会失效
-              ),
-
-              // Badge(
-              //   //文本内容Text为空时子组件为null时则返回一个红点，其他值时按实际显示
-              //   badgeContent:Text(""),
-              //   child: Text("待收货"), //子组件
-              //   badgeColor: Colors.red,  //右上角小红点颜色（默认时为红色）
-              //   showBadge: true,//true时刷新时会在右则摆动一下
-              //   animationDuration:Duration(seconds: 10),//小点点在右侧摆动的时间,这里为10秒
-              //   toAnimate:true, //允许摆动，false时showBadge会失效
-              //
-              // ),
-              Badge(
-                //文本内容Text为空时子组件为null时则返回一个红点，其他值时按实际显示
-                badgeContent: Text(""),
-                child: Container(
-                    height: 80,
-                    width: 40,
-                    child: Column(
-                      children: <Widget>[
-                        IconButton(
-                          onPressed: () {
-                            Navigator.pushNamed(context, "/receiveOrder");
-                          },
-                          icon: Icon(
-                            Icons.people,
-                            size: 32.0,
-                          ),
-                        ),
-                        Text(
-                          "待收货",
-                          style: new TextStyle(
-                            fontFamily: "Ewert",
-                            fontSize: 12,
-                          ),
-                          softWrap: false,
-                        )
-                      ],
-                    )),
-                //子组件
-                badgeColor: Colors.red,
-                //右上角小红点颜色（默认时为红色）
-                showBadge: true,
-                //true时刷新时会在右则摆动一下
-                animationDuration: Duration(seconds: 10),
-                //小点点在右侧摆动的时间,这里为10秒
-                toAnimate: true, //允许摆动，false时showBadge会失效
-              ),
-              Badge(
-                //文本内容Text为空时子组件为null时则返回一个红点，其他值时按实际显示
-                badgeContent: Text(""),
-                child: Container(
-                    height: 80,
-                    width: 40,
-                    child: Column(
-                      children: <Widget>[
-                        IconButton(
-                          onPressed: () {
-                            Navigator.pushNamed(context, "/receiveOrder");
-                          },
-                          icon: Icon(
-                            Icons.star,
-                            size: 32.0,
-                          ),
-                        ),
-                        Text(
-                          "收藏",
-                          style: new TextStyle(
-                            fontFamily: "Ewert",
-                            fontSize: 12,
-                          ),
-                          softWrap: false,
-                        ),
-                      ],
-                    )),
-                //子组件
-                badgeColor: Colors.red,
-                //右上角小红点颜色（默认时为红色）
-                showBadge: true,
-                //true时刷新时会在右则摆动一下
-                animationDuration: Duration(seconds: 10),
-                //小点点在右侧摆动的时间,这里为10秒
-                toAnimate: true, //允许摆动，false时showBadge会失效
-              ),
-              // Badge(
-              //   //文本内容Text为空时子组件为null时则返回一个红点，其他值时按实际显示
-              //   badgeContent:Text(""),
-              //   child: Text("待配送"), //子组件
-              //   badgeColor: Colors.red,  //右上角小红点颜色（默认时为红色）
-              //   showBadge: true,//true时刷新时会在右则摆动一下
-              //   animationDuration:Duration(seconds: 10),//小点点在右侧摆动的时间,这里为10秒
-              //   toAnimate:true, //允许摆动，false时showBadge会失效
-              //
-              // ),
-            ],
-          )),
+      backgroundColor: Color(0xfff7c341),
+      body: MyselfList(this.userID),
     );
   }
 }
@@ -486,6 +552,7 @@ class MyList extends StatefulWidget {
 
 class MyListState extends State<MyList> {
 
+
   List<Map<String, String>> sends = [
     {"id": "1", "d": "kk", "rp": "receiver", "time": "11/31"},
     {"id": "2", "d": "kk", "rp": "receiver", "time": "11/31"},
@@ -510,7 +577,7 @@ class MyListState extends State<MyList> {
           return Container(
             height: 150,
             decoration: BoxDecoration(
-              //border: new Border.all(color: Color(0xFF3E3737), width: 2),
+                //border: new Border.all(color: Color(0xFF3E3737), width: 2),
                 color: const Color(0xFFFFFFFF),
                 borderRadius: BorderRadius.circular((10.0))),
             margin: const EdgeInsets.only(left: 0.0, right: 0.0, top: 5.0),
@@ -520,27 +587,27 @@ class MyListState extends State<MyList> {
                   children: [
                     Expanded(
                         child: Container(
-                          margin: const EdgeInsets.only(top: 10.0),
-                          child: Row(
-                            children: [
-                              Expanded(
-                                child: Text(
-                                  '订单号：${sends[index]["id"]}',
-                                  style: const TextStyle(
-                                      fontWeight: FontWeight.bold, fontSize: 15),
-                                  textAlign: TextAlign.left,
-                                ),
-                              ),
-                              Expanded(
-                                child: Text(
-                                  '${sends[index]["time"]}',
-                                  style: const TextStyle(),
-                                  textAlign: TextAlign.right,
-                                ),
-                              )
-                            ],
+                      margin: const EdgeInsets.only(top: 10.0),
+                      child: Row(
+                        children: [
+                          Expanded(
+                            child: Text(
+                              '订单号：${sends[index]["id"]}',
+                              style: const TextStyle(
+                                  fontWeight: FontWeight.bold, fontSize: 15),
+                              textAlign: TextAlign.left,
+                            ),
                           ),
-                        ))
+                          Expanded(
+                            child: Text(
+                              '${sends[index]["time"]}',
+                              style: const TextStyle(),
+                              textAlign: TextAlign.right,
+                            ),
+                          )
+                        ],
+                      ),
+                    ))
                   ],
                 ),
                 const Divider(
@@ -550,49 +617,49 @@ class MyListState extends State<MyList> {
                   children: [
                     Expanded(
                         child: Container(
-                          margin: const EdgeInsets.only(top: 10.0),
-                          child: Row(
-                            children: [
-                              Expanded(
-                                child: Text(
-                                  '收货人：${sends[index]["rp"]}',
-                                  style: const TextStyle(fontSize: 15.0),
-                                  textAlign: TextAlign.left,
-                                ),
-                              ),
-                              Expanded(
-                                child: Text(
-                                  '目的地：${sends[index]["d"]}',
-                                  style: const TextStyle(fontSize: 15.0),
-                                  textAlign: TextAlign.right,
-                                ),
-                              )
-                            ],
+                      margin: const EdgeInsets.only(top: 10.0),
+                      child: Row(
+                        children: [
+                          Expanded(
+                            child: Text(
+                              '收货人：${sends[index]["rp"]}',
+                              style: const TextStyle(fontSize: 15.0),
+                              textAlign: TextAlign.left,
+                            ),
                           ),
-                        ))
+                          Expanded(
+                            child: Text(
+                              '目的地：${sends[index]["d"]}',
+                              style: const TextStyle(fontSize: 15.0),
+                              textAlign: TextAlign.right,
+                            ),
+                          )
+                        ],
+                      ),
+                    ))
                   ],
                 ),
                 Row(
                   children: [
                     Expanded(
                         child: Container(
-                          alignment: Alignment.centerRight,
-                          margin: const EdgeInsets.only(right: 10.0, top: 20.0),
-                          child: ElevatedButton(
-                            style: ElevatedButton.styleFrom(
-                                shadowColor: Colors.red,
-                                fixedSize: const Size.fromHeight(10)),
-                            child: const Text(
-                              '已送达',
-                              style: TextStyle(fontSize: 15.0),
-                            ),
-                            onPressed: () {
-                              setState(() {
-                                sends.removeAt(index);
-                              });
-                            },
-                          ),
-                        ))
+                      alignment: Alignment.centerRight,
+                      margin: const EdgeInsets.only(right: 10.0, top: 20.0),
+                      child: ElevatedButton(
+                        style: ElevatedButton.styleFrom(
+                            shadowColor: Colors.red,
+                            fixedSize: const Size.fromHeight(10)),
+                        child: const Text(
+                          '已送达',
+                          style: TextStyle(fontSize: 15.0),
+                        ),
+                        onPressed: () {
+                          setState(() {
+                            sends.removeAt(index);
+                          });
+                        },
+                      ),
+                    ))
                   ],
                 ),
               ],
@@ -622,6 +689,7 @@ class _Order_SendRoute extends StatelessWidget {
 
 class ExpansionList extends StatefulWidget {
 
+
   late List receiveOrders = [];
   
   ExpansionList(List receiveOrders) {
@@ -635,11 +703,14 @@ class ExpansionList extends StatefulWidget {
 }
 
 class ExpansionListState extends State<ExpansionList> {
+
   
   late List receiveOrders = [];
   
   ExpansionListState(List receiveOrders) {
     this.receiveOrders = receiveOrders;
+
+
   }
 
   // final List<Map<String, String>> receiveOrders = [
@@ -756,23 +827,23 @@ class ExpansionListState extends State<ExpansionList> {
           children: [
             Expanded(
                 child: Row(
-                  children: [
-                    Expanded(
-                      child: Text(
-                        '${item["foodname"]}',
-                        textAlign: TextAlign.left,
-                        style: const TextStyle(fontSize: 16.0),
-                      ),
-                    ),
-                    Expanded(
-                      child: Text(
-                        '${item["time"]}',
-                        textAlign: TextAlign.right,
-                        style: const TextStyle(fontSize: 16.0),
-                      ),
-                    )
-                  ],
-                ))
+              children: [
+                Expanded(
+                  child: Text(
+                    '${item["foodname"]}',
+                    textAlign: TextAlign.left,
+                    style: const TextStyle(fontSize: 16.0),
+                  ),
+                ),
+                Expanded(
+                  child: Text(
+                    '${item["time"]}',
+                    textAlign: TextAlign.right,
+                    style: const TextStyle(fontSize: 16.0),
+                  ),
+                )
+              ],
+            ))
           ],
         ),
       );
@@ -856,7 +927,7 @@ class ExpansionListState extends State<ExpansionList> {
           child: Container(
               margin: const EdgeInsets.only(left: 10.0, right: 10.0, top: 10.0),
               decoration: BoxDecoration(
-                //border: new Border.all(color: Color(0xFF3E3737), width: 2),
+                  //border: new Border.all(color: Color(0xFF3E3737), width: 2),
                   color: const Color(0xFFFFFFFF),
                   borderRadius: BorderRadius.circular((30.0))),
               child: Column(
@@ -870,7 +941,10 @@ class ExpansionListState extends State<ExpansionList> {
 
 class _Order_ReceiveRoute extends StatelessWidget {
 
+
   late List receiveOrders = [];
+
+
 
   @override
   Widget build(BuildContext context) {

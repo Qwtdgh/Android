@@ -42,7 +42,7 @@ class HttpRequest {
 
   Future<dynamic> post(String uri, dynamic body, {Map<String, String>? headers}) async {
     try {
-      http.Response response = await http.post(Uri.parse(baseUrl + uri), body: body, headers: headers);
+      http.Response response = await http.post(Uri.parse(baseUrl + uri), body: Convert.jsonEncode(body), headers: headers);
       final statusCode = response.statusCode;
       final responseBody = response.body;
       var result = Convert.jsonDecode(responseBody);

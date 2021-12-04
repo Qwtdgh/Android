@@ -1,5 +1,6 @@
 part of main;
 
+
 class _OrderGetPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
@@ -11,9 +12,9 @@ class _OrderGetPage extends StatelessWidget {
       home: Scaffold(
         backgroundColor: const Color.fromARGB(255, 239, 239, 239),
         appBar: AppBar(
-          title: Text("抢单"),
+          title: const Text("抢单"),
         ),
-        body: _Order_Get_List(),
+        body: const _Order_Get_List(),
       ),
     );
   }
@@ -116,6 +117,19 @@ class _Order_Get_List_State extends State<_Order_Get_List> {
                 ),
                 Row(
                   children: [
+                    ElevatedButton(
+                        onPressed: () {
+                          print("yes");
+                          var http =  HttpRequest("http://delivery.mcatk.com");
+                          var body ={"userID": "1"};
+
+                          var ret =  http.post("/api/getInformation/", body);
+                          if (ret == '') {
+                            print("wokaoooooooooooooooooo");
+                          }
+                        },
+                        child: const Text('try')
+                    ),
                     Expanded(
                         child: Container(
                           alignment: Alignment.centerRight,

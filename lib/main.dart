@@ -9,20 +9,22 @@ import 'package:badges/badges.dart';
 
 part 'dishes_display.dart';
 part 'dish_display.dart';
-part 'order.dart';
 part 'canteen.dart';
 part 'canteen_display.dart';
 part 'order_get.dart';
 part 'user.dart';
 
-void main() => runApp(const MyApp());
+//void main() => runApp(const MyApp());
 
-class MyApp extends StatelessWidget {
-  const MyApp({Key? key}) : super(key: key);
+class Main_Page extends StatelessWidget {
+  const Main_Page({Key? key}) : super(key: key);
   static const String _title = 'My Demo';
 
   @override
   Widget build(BuildContext context) {
+
+    late Main_Page userID;
+    userID = ModalRoute.of(context)!.settings.arguments as Main_Page;
     return const MaterialApp(
       title: _title,
       home: _BottomSelection(),

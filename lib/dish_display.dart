@@ -29,8 +29,9 @@ class _DishInfo extends StatelessWidget {
 
 class _DishInfoPage extends StatelessWidget {
   final DishInfo data;
+  List<DishInfo> shopping_list = List.empty(growable: true);
 
-  const _DishInfoPage({
+  _DishInfoPage({
     Key? key,
     required this.data,
   }) : super(key: key);
@@ -244,8 +245,6 @@ class _DishInfoPage extends StatelessWidget {
           constraints: const BoxConstraints(minHeight: 50, minWidth: 20),
           alignment: Alignment.topRight,
           margin: const EdgeInsets.all(1),
-          // padding: const EdgeInsets.all(10),
-          // constraints: const BoxConstraints.expand(),
           child: ElevatedButton(
             child: const Icon(Icons.add_shopping_cart),
             style: ElevatedButton.styleFrom(
@@ -258,7 +257,9 @@ class _DishInfoPage extends StatelessWidget {
                 color: Colors.yellow,
               ),
             ),
-            onPressed: () {},
+            onPressed: () {
+              shopping_list.add(data);
+            },
           )),
     ]);
   }
@@ -287,7 +288,7 @@ class _DishInfoPage extends StatelessWidget {
               ),
               child: ElevatedButton(
                 onPressed: () {
-                  Navigator.pushNamed(context, '/cart');
+                  Navigator.pushNamed(context, '/cart', arguments: shopping_list);
                 },
                 child: const Icon(Icons.shopping_cart),
               ),

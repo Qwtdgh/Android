@@ -13,7 +13,7 @@ class _HomePage extends StatelessWidget {
         '/home': (context) => _Home_Root(),
         '/home/dishdisplay': (context, {arguments}) => _DishInfo(),
         // '/receive': (context) => const _Order_ReceiveRoute(),
-        '/cart': (context) => _Shopping_Cart(),
+        '/cart': (context) => _ShoppingCart(),
       },
     );
   }

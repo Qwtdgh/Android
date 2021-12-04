@@ -1,6 +1,6 @@
 part of main;
 
-class _Shopping_Cart extends StatelessWidget {
+class _ShoppingCart extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     var shoppingList = ModalRoute
@@ -36,8 +36,8 @@ class _Shopping_Cart extends StatelessWidget {
 }
 
 class _CartBody extends StatelessWidget {
-  late List<DishInfo> shoppingList;
-  _CartBody(this.shoppingList);
+  final List<DishInfo> shoppingList;
+  const _CartBody(this.shoppingList);
 
   @override
   Widget build(BuildContext context) {
@@ -46,8 +46,8 @@ class _CartBody extends StatelessWidget {
 }
 
 class _GuessYouLikePage extends StatefulWidget {
-  late List<DishInfo> shoppingList;
-  _GuessYouLikePage(this.shoppingList);
+  final List<DishInfo> shoppingList;
+  const _GuessYouLikePage(this.shoppingList);
 
   @override
   _GuessYouLikePageState createState() => _GuessYouLikePageState(shoppingList);
@@ -61,21 +61,21 @@ class _GuessYouLikePageState extends State<_GuessYouLikePage> {
     return ListView.builder(
       itemCount: shoppingList.length,
       itemBuilder: (BuildContext context, int index) {
-        return _shopping_card(shoppingList[index]);
+        return _ShoppingCard(shoppingList[index]);
       },
     );
   }
 }
 
-class _shopping_card extends StatelessWidget {
-  late DishInfo shoppingDish;
-  _shopping_card(this.shoppingDish);
+class _ShoppingCard extends StatelessWidget {
+  final DishInfo shoppingDish;
+  const _ShoppingCard(this.shoppingDish);
 
   @override
   Widget build(BuildContext context) {
     return Column(
         children: [
-          SizedBox(height: 25.0),
+          const SizedBox(height: 25.0),
           getFoodItem(
             context,
               shoppingDish.dishName,
@@ -83,7 +83,7 @@ class _shopping_card extends StatelessWidget {
               shoppingDish.dishPrice,
               shoppingDish.dishPlace,
               5),
-          SizedBox(height: 25.0),
+          const SizedBox(height: 25.0),
           Padding(
             padding: const EdgeInsets.only(left: 125.0),
             child: Container(height: 1.0, color: Colors.grey),
@@ -114,7 +114,7 @@ class _shopping_card extends StatelessWidget {
             Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: <Widget>[
-                Container(
+                SizedBox(
                     width: MediaQuery
                         .of(context)
                         .size

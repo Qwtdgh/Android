@@ -1,6 +1,11 @@
 part of main;
 
 class _UserPage extends StatelessWidget {
+  late int userID;
+  _UserPage(int userID) {
+    this.userID = userID;
+  }
+
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
@@ -11,8 +16,8 @@ class _UserPage extends StatelessWidget {
       routes: {
         "/": (context) => Myself(),
         "/personalInfo": (context) => PersonalInfo(),
-        "/sendOrder": (context) => _Order_SendRoute(),
-        "/receiveOrder": (context) => _Order_ReceiveRoute(),
+        "/sendOrder": (context) => _Order_SendRoute(this.userID),
+        "/receiveOrder": (context) => _Order_ReceiveRoute(this.userID),
         "/wallet": (context) => Wallet(),
       },
     );
@@ -473,13 +478,21 @@ List<Item> generateItems(int numberOfItems) {
 // }
 
 class MyList extends StatefulWidget {
-  const MyList({Key? key}) : super(key: key);
+  late int userID;
+  MyList(int userID) {
+    this.userID = userID;
+  }
 
   @override
-  createState() => MyListState();
+  createState() => MyListState(this.userID);
 }
 
 class MyListState extends State<MyList> {
+  late int userID;
+  MyListState(int userID) {
+    this.userID = userID;
+  }
+
   List<Map<String, String>> sends = [
     {"id": "1", "d": "kk", "rp": "receiver", "time": "11/31"},
     {"id": "2", "d": "kk", "rp": "receiver", "time": "11/31"},
@@ -597,7 +610,10 @@ class MyListState extends State<MyList> {
 }
 
 class _Order_SendRoute extends StatelessWidget {
-  const _Order_SendRoute({Key? key}) : super(key: key);
+  late int userID;
+  _Order_SendRoute(int userID) {
+    this.userID = userID;
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -609,21 +625,30 @@ class _Order_SendRoute extends StatelessWidget {
         shadowColor: Colors.yellow,
       ),
       backgroundColor: const Color.fromARGB(255, 239, 239, 239),
-      body: const MyList(),
+      body: MyList(this.userID),
     );
   }
 }
 
 class ExpansionList extends StatefulWidget {
-  const ExpansionList({Key? key}) : super(key: key);
+  late int userID;
+  ExpansionList(int userID) {
+    this.userID = userID;
+  }
 
   @override
   State createState() {
-    return ExpansionListState();
+    return ExpansionListState(this.userID);
   }
 }
 
 class ExpansionListState extends State<ExpansionList> {
+
+  late int userID;
+  ExpansionListState(int userID) {
+    this.userID = userID;
+  }
+
   final List<Map<String, String>> _receiveInfo = [
     {
       "time": "11-30",
@@ -849,7 +874,10 @@ class ExpansionListState extends State<ExpansionList> {
 }
 
 class _Order_ReceiveRoute extends StatelessWidget {
-  const _Order_ReceiveRoute({Key? key}) : super(key: key);
+  late int userID;
+  _Order_ReceiveRoute(int userID) {
+    this.userID = userID;
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -857,7 +885,7 @@ class _Order_ReceiveRoute extends StatelessWidget {
       appBar: AppBar(
         title: const Text("收餐"),
       ),
-      body: const Center(child: ExpansionList()),
+      body: Center(child: ExpansionList(this.userID)),
     );
   }
 }

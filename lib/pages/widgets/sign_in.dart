@@ -1,3 +1,5 @@
+import 'dart:convert' as Convert;
+import 'package:http/http.dart' as http;
 import 'dart:io';
 import 'package:delivery/http.dart';
 import 'package:flutter/material.dart';
@@ -171,15 +173,27 @@ class _SignInState extends State<SignIn> {
                           fontFamily: 'WorkSansBold'),
                     ),
                   ),
-                  onPressed:  () {
+                  onPressed: ()
+                  async{
                     CustomSnackBar(
                         context, const Text('Login button pressed'));
-                    var http =  HttpRequest("http://delivery.mcatk.com");
+
+                    var baseUrl = "http://delivery.mcatk.com";
+                    var uri = "/api/login/";
                     var body ={"userName": loginNameController.text, "userPassword": loginPasswordController.text};
-                    var ret = http.post("/api/login/", body);
-                    print(ret);
-                    //var userID = ((Map)ret)["userID"];
-                    Navigator.pushNamed(context, "/main", arguments: ret);
+                    http.Response response = await http.post(Uri.parse(baseUrl + uri), body: Convert.jsonEncode(body));
+                    final statusCode = response.statusCode;
+                    final responseBody = response.body;
+                    var result = Convert.jsonDecode(responseBody);
+                    print('[uri=$uri][statusCode=$statusCode][response=$responseBody]');
+
+                    //var http =  HttpRequest("http://delivery.mcatk.com");
+
+                    //Map<String, String> ret = http.post("/api/login/", body) as Map<String, String>;
+                    //String? userID = ret["userID"];
+                    var userID = result["userID"];
+                    print(userID);
+                    Navigator.pushNamed(context, "/main", arguments: userID);
                   },
                 ),
               )

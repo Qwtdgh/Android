@@ -8,7 +8,7 @@ class _HomePage extends StatelessWidget {
       theme: ThemeData(
         primarySwatch: Colors.yellow,
       ),
-      initialRoute: '/home',
+      initialRoute: '/',
       routes: {
         '/': (context) => _Home_Root(),
         '/singledisplay': (context, {arguments}) => _DishInfo(),

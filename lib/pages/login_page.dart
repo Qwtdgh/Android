@@ -162,7 +162,7 @@ class _LoginPageState extends State<LoginPage>
   }
 
   void _onSignUpButtonPress() {
-    _pageController?.animateToPage(1,
+    _pageController.animateToPage(1,
         duration: const Duration(milliseconds: 500), curve: Curves.decelerate);
   }
 }

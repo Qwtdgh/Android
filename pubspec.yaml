@@ -38,6 +38,7 @@ dependencies:
   cupertino_icons: ^1.0.2
   smooth_star_rating: 1.1.1
   http: ^0.13.4
+  dio: ^4.0.3
   font_awesome_flutter:
 
 

@@ -6,6 +6,8 @@ import 'package:smooth_star_rating/smooth_star_rating.dart';
 import 'package:flutter/cupertino.dart';
 import 'dart:convert' as Convert;
 import 'package:badges/badges.dart';
+import 'dart:async';
+import 'package:http/http.dart' as http;
 
 part 'dishes_display.dart';
 part 'dish_display.dart';
@@ -23,26 +25,34 @@ class Main_Page extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
 
-    late Main_Page userID;
-    userID = ModalRoute.of(context)!.settings.arguments as Main_Page;
-    return const MaterialApp(
+    late int userID = -1;
+    userID = ModalRoute.of(context)!.settings.arguments as int;
+    return MaterialApp(
       title: _title,
-      home: _BottomSelection(),
+      home: _BottomSelection(userID),
     );
   }
 }
 
 class _BottomSelection extends StatefulWidget {
-  const _BottomSelection({Key? key}) : super(key: key);
+
+  late int userID;
+  _BottomSelection(int userID) {
+    this.userID = userID;
+  }
 
   @override
-  _BottomSelectionState createState() => _BottomSelectionState();
+  _BottomSelectionState createState() => _BottomSelectionState(userID);
 }
 
 class _BottomSelectionState extends State<_BottomSelection> {
   late var dishInfo;
   late int _selectedIndex;
   late List<Widget> _widgetOptions;
+  late int userID;
+  _BottomSelectionState(int userID) {
+    this.userID = userID;
+  }
 
   @override
   void initState() {
@@ -72,7 +82,7 @@ class _BottomSelectionState extends State<_BottomSelection> {
         'Index 4: My',
         style: optionStyle,
       ),*/
-      _UserPage(),
+      _UserPage(this.userID),
     ];
   }
 

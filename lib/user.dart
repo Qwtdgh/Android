@@ -2,6 +2,7 @@ part of main;
 
 class _UserPage extends StatelessWidget {
   late int userID;
+
   _UserPage(int userID) {
     this.userID = userID;
   }
@@ -10,11 +11,11 @@ class _UserPage extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       theme: ThemeData(
-      primarySwatch: Colors.yellow,
+        primarySwatch: Colors.yellow,
       ),
       initialRoute: "/",
       routes: {
-        "/": (context) => Myself(),
+        "/": (context) => Myself(this.userID),
         "/personalInfo": (context) => PersonalInfo(),
         "/sendOrder": (context) => _Order_SendRoute(this.userID),
         "/receiveOrder": (context) => _Order_ReceiveRoute(this.userID),
@@ -25,8 +26,73 @@ class _UserPage extends StatelessWidget {
 }
 
 class Myself extends StatelessWidget {
+  late int userID;
+  late String userNickname;
+  late String userAddress;
+  late String userTel;
+  late List sendOrders;
+  late List receiveOrders;
+  Myself(int userID) {
+    this.userID = userID;
+    this.userNickname="";
+    this.userAddress="";
+    this.userTel="";
+  }
+  // fun(BuildContext context) async {
+  //   // CustomSnackBar(context, const Text('Login button pressed'));
+  //
+  //   var baseUrl = "http://delivery.mcatk.com";
+  //   var uri = "/api/getInformation/";
+  //   var body = {"userID": this.userID};
+  //   http.Response response = await http.post(Uri.parse(baseUrl + uri),
+  //       body: Convert.jsonEncode(body));
+  //   final statusCode = response.statusCode;
+  //   final responseBody = response.body;
+  //   var result = Convert.jsonDecode(responseBody);
+  //   print('[uri=$uri][statusCode=$statusCode][response=$responseBody]');
+  //
+  //   //var http =  HttpRequest("http://delivery.mcatk.com");
+  //
+  //   //Map<String, String> ret = http.post("/api/login/", body) as Map<String, String>;
+  //   //String? userID = ret["userID"];
+  //   var userID = result["userID"];
+  //   print(userID);
+  //   this.userNickname = result["userNickName"];
+  //   this.userAddress = result["userAddress"];
+  //   this.userTel = result["userTel"];
+  //   this.receiveOrders = result["userOrders"];
+  //   this.sendOrders = result["userDeliveryOrders"];
+  //   // Navigator.pushNamed(context, "/main", arguments: userID);
+  // }
+
   @override
   Widget build(BuildContext context) {
+    fun(BuildContext context) async {
+      // CustomSnackBar(context, const Text('Login button pressed'));
+
+      var baseUrl = "http://delivery.mcatk.com";
+      var uri = "/api/getInformation/";
+      var body = {"userID": this.userID};
+      http.Response response = await http.post(Uri.parse(baseUrl + uri), body: Convert.jsonEncode(body));
+      final statusCode = response.statusCode;
+      final responseBody = response.body;
+      var result = Convert.jsonDecode(responseBody);
+      print('[uri=$uri][statusCode=$statusCode][response=$responseBody]');
+
+      //var http =  HttpRequest("http://delivery.mcatk.com");
+
+      //Map<String, String> ret = http.post("/api/login/", body) as Map<String, String>;
+      //String? userID = ret["userID"];
+      var userID = result["userID"];
+      print(userID);
+      this.userNickname = result["userNickName"];
+      this.userAddress = result["userAddress"];
+      this.userTel = result["userTel"];
+      this.receiveOrders = result["userOrders"];
+      this.sendOrders = result["userDeliveryOrders"];
+      // Navigator.pushNamed(context, "/main", arguments: userID);
+    };
+    fun(context);
     return Scaffold(
       appBar: AppBar(
         title: Text("Myself"),
@@ -118,7 +184,7 @@ class Myself extends StatelessWidget {
                     width: 100,
                     height: 100,
                     child: Image.asset("images/login/login_logo.png")),
-                Text("用户昵称"),
+                Text(this.userNickname),
               ])),
     );
   }
@@ -155,7 +221,7 @@ class Myself extends StatelessWidget {
                     Icons.account_box,
                     size: 32.0,
                   ),
-                  Text("zzh")
+                  Text(this.userNickname)
                 ],
               ),
               Row(
@@ -165,7 +231,7 @@ class Myself extends StatelessWidget {
                     Icons.home,
                     size: 32.0,
                   ),
-                  Text("地址")
+                  Text(this.userAddress)
                 ],
               ),
               Row(
@@ -175,7 +241,7 @@ class Myself extends StatelessWidget {
                     Icons.phone,
                     size: 32.0,
                   ),
-                  Text("电话")
+                  Text(this.userTel)
                 ],
               ),
               Row(
@@ -183,6 +249,8 @@ class Myself extends StatelessWidget {
                 children: <Widget>[
                   IconButton(
                     onPressed: () {
+                      //修改信息部分
+                      //需要调用修改信息的函数
                       Navigator.pushNamed(context, route);
                     },
                     icon: Icon(
@@ -479,6 +547,7 @@ List<Item> generateItems(int numberOfItems) {
 
 class MyList extends StatefulWidget {
   late int userID;
+
   MyList(int userID) {
     this.userID = userID;
   }
@@ -489,6 +558,7 @@ class MyList extends StatefulWidget {
 
 class MyListState extends State<MyList> {
   late int userID;
+
   MyListState(int userID) {
     this.userID = userID;
   }
@@ -517,7 +587,7 @@ class MyListState extends State<MyList> {
           return Container(
             height: 150,
             decoration: BoxDecoration(
-              //border: new Border.all(color: Color(0xFF3E3737), width: 2),
+                //border: new Border.all(color: Color(0xFF3E3737), width: 2),
                 color: const Color(0xFFFFFFFF),
                 borderRadius: BorderRadius.circular((10.0))),
             margin: const EdgeInsets.only(left: 0.0, right: 0.0, top: 5.0),
@@ -527,27 +597,27 @@ class MyListState extends State<MyList> {
                   children: [
                     Expanded(
                         child: Container(
-                          margin: const EdgeInsets.only(top: 10.0),
-                          child: Row(
-                            children: [
-                              Expanded(
-                                child: Text(
-                                  '订单号：${sends[index]["id"]}',
-                                  style: const TextStyle(
-                                      fontWeight: FontWeight.bold, fontSize: 15),
-                                  textAlign: TextAlign.left,
-                                ),
-                              ),
-                              Expanded(
-                                child: Text(
-                                  '${sends[index]["time"]}',
-                                  style: const TextStyle(),
-                                  textAlign: TextAlign.right,
-                                ),
-                              )
-                            ],
+                      margin: const EdgeInsets.only(top: 10.0),
+                      child: Row(
+                        children: [
+                          Expanded(
+                            child: Text(
+                              '订单号：${sends[index]["id"]}',
+                              style: const TextStyle(
+                                  fontWeight: FontWeight.bold, fontSize: 15),
+                              textAlign: TextAlign.left,
+                            ),
                           ),
-                        ))
+                          Expanded(
+                            child: Text(
+                              '${sends[index]["time"]}',
+                              style: const TextStyle(),
+                              textAlign: TextAlign.right,
+                            ),
+                          )
+                        ],
+                      ),
+                    ))
                   ],
                 ),
                 const Divider(
@@ -557,49 +627,49 @@ class MyListState extends State<MyList> {
                   children: [
                     Expanded(
                         child: Container(
-                          margin: const EdgeInsets.only(top: 10.0),
-                          child: Row(
-                            children: [
-                              Expanded(
-                                child: Text(
-                                  '收货人：${sends[index]["rp"]}',
-                                  style: const TextStyle(fontSize: 15.0),
-                                  textAlign: TextAlign.left,
-                                ),
-                              ),
-                              Expanded(
-                                child: Text(
-                                  '目的地：${sends[index]["d"]}',
-                                  style: const TextStyle(fontSize: 15.0),
-                                  textAlign: TextAlign.right,
-                                ),
-                              )
-                            ],
+                      margin: const EdgeInsets.only(top: 10.0),
+                      child: Row(
+                        children: [
+                          Expanded(
+                            child: Text(
+                              '收货人：${sends[index]["rp"]}',
+                              style: const TextStyle(fontSize: 15.0),
+                              textAlign: TextAlign.left,
+                            ),
                           ),
-                        ))
+                          Expanded(
+                            child: Text(
+                              '目的地：${sends[index]["d"]}',
+                              style: const TextStyle(fontSize: 15.0),
+                              textAlign: TextAlign.right,
+                            ),
+                          )
+                        ],
+                      ),
+                    ))
                   ],
                 ),
                 Row(
                   children: [
                     Expanded(
                         child: Container(
-                          alignment: Alignment.centerRight,
-                          margin: const EdgeInsets.only(right: 10.0, top: 20.0),
-                          child: ElevatedButton(
-                            style: ElevatedButton.styleFrom(
-                                shadowColor: Colors.red,
-                                fixedSize: const Size.fromHeight(10)),
-                            child: const Text(
-                              '已送达',
-                              style: TextStyle(fontSize: 15.0),
-                            ),
-                            onPressed: () {
-                              setState(() {
-                                sends.removeAt(index);
-                              });
-                            },
-                          ),
-                        ))
+                      alignment: Alignment.centerRight,
+                      margin: const EdgeInsets.only(right: 10.0, top: 20.0),
+                      child: ElevatedButton(
+                        style: ElevatedButton.styleFrom(
+                            shadowColor: Colors.red,
+                            fixedSize: const Size.fromHeight(10)),
+                        child: const Text(
+                          '已送达',
+                          style: TextStyle(fontSize: 15.0),
+                        ),
+                        onPressed: () {
+                          setState(() {
+                            sends.removeAt(index);
+                          });
+                        },
+                      ),
+                    ))
                   ],
                 ),
               ],
@@ -611,6 +681,7 @@ class MyListState extends State<MyList> {
 
 class _Order_SendRoute extends StatelessWidget {
   late int userID;
+
   _Order_SendRoute(int userID) {
     this.userID = userID;
   }
@@ -632,6 +703,7 @@ class _Order_SendRoute extends StatelessWidget {
 
 class ExpansionList extends StatefulWidget {
   late int userID;
+
   ExpansionList(int userID) {
     this.userID = userID;
   }
@@ -643,8 +715,8 @@ class ExpansionList extends StatefulWidget {
 }
 
 class ExpansionListState extends State<ExpansionList> {
-
   late int userID;
+
   ExpansionListState(int userID) {
     this.userID = userID;
   }
@@ -761,23 +833,23 @@ class ExpansionListState extends State<ExpansionList> {
           children: [
             Expanded(
                 child: Row(
-                  children: [
-                    Expanded(
-                      child: Text(
-                        '${item["foodname"]}',
-                        textAlign: TextAlign.left,
-                        style: const TextStyle(fontSize: 16.0),
-                      ),
-                    ),
-                    Expanded(
-                      child: Text(
-                        '${item["time"]}',
-                        textAlign: TextAlign.right,
-                        style: const TextStyle(fontSize: 16.0),
-                      ),
-                    )
-                  ],
-                ))
+              children: [
+                Expanded(
+                  child: Text(
+                    '${item["foodname"]}',
+                    textAlign: TextAlign.left,
+                    style: const TextStyle(fontSize: 16.0),
+                  ),
+                ),
+                Expanded(
+                  child: Text(
+                    '${item["time"]}',
+                    textAlign: TextAlign.right,
+                    style: const TextStyle(fontSize: 16.0),
+                  ),
+                )
+              ],
+            ))
           ],
         ),
       );
@@ -861,7 +933,7 @@ class ExpansionListState extends State<ExpansionList> {
           child: Container(
               margin: const EdgeInsets.only(left: 10.0, right: 10.0, top: 10.0),
               decoration: BoxDecoration(
-                //border: new Border.all(color: Color(0xFF3E3737), width: 2),
+                  //border: new Border.all(color: Color(0xFF3E3737), width: 2),
                   color: const Color(0xFFFFFFFF),
                   borderRadius: BorderRadius.circular((30.0))),
               child: Column(
@@ -875,6 +947,7 @@ class ExpansionListState extends State<ExpansionList> {
 
 class _Order_ReceiveRoute extends StatelessWidget {
   late int userID;
+
   _Order_ReceiveRoute(int userID) {
     this.userID = userID;
   }

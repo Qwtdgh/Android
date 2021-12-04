@@ -8,11 +8,12 @@ class _HomePage extends StatelessWidget {
       theme: ThemeData(
         primarySwatch: Colors.yellow,
       ),
-      initialRoute: '/',
+      initialRoute: '/home',
       routes: {
-        '/': (context) => _Home_Root(),
-        '/singledisplay': (context, {arguments}) => _DishInfo(),
+        '/home': (context) => _Home_Root(),
+        '/home/dishdisplay': (context, {arguments}) => _DishInfo(),
         // '/receive': (context) => const _Order_ReceiveRoute(),
+        '/cart': (context) => _Shopping_Cart(),
       },
     );
   }
@@ -65,7 +66,7 @@ class _SuggestedDishCard extends StatelessWidget {
   Widget build(BuildContext context) {
     return GestureDetector(
       onTap: () {
-        Navigator.pushNamed(context, '/singledisplay', arguments: data);
+        Navigator.pushNamed(context, '/home/dishdisplay', arguments: data);
       },
       child: Container(
         margin: const EdgeInsets.fromLTRB(16, 13, 16, 0),
@@ -147,6 +148,34 @@ class _SuggestedDishCard extends StatelessWidget {
                 ),
               ),
             ),
+          ),
+          Positioned(
+            left: 0,
+            right: 0,
+            bottom: 0,
+            height: 100,
+            child: Container(
+              // padding: const EdgeInsets.fromLTRB(10, 0, 10, 10),
+                alignment: Alignment.bottomRight,
+                child: Container(
+                  padding: const EdgeInsets.only(left: 5.0),
+                  height: 40.0,
+                  width: 40.0,
+                  decoration: const BoxDecoration(
+                    borderRadius: BorderRadius.only(
+                      topLeft: Radius.circular(20.0),
+                    ),
+                    color: Color(0xFFF76765),
+                  ),
+                  child: Center(
+                      child: TextButton(
+                        child: const Icon(
+                          Icons.favorite_border,
+                          color: Colors.white,
+                        ),
+                        onPressed: () {},
+                      )),
+                )),
           ),
         ],
       ),

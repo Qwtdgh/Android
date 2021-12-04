@@ -15,6 +15,7 @@ part 'canteen.dart';
 part 'canteen_display.dart';
 part 'order_get.dart';
 part 'user.dart';
+part 'cart.dart';
 
 //void main() => runApp(const MyApp());
 
@@ -64,24 +65,8 @@ class _BottomSelectionState extends State<_BottomSelection> {
         TextStyle(fontSize: 30, fontWeight: FontWeight.bold);
     _widgetOptions = <Widget>[
       _HomePage(),
-      const Text(
-        'Index 1: Hot Dishes',
-        style: optionStyle,
-      ),
       _CanteenPage(),
-      /*const Text(
-        'Index 2: Category',
-        style: optionStyle,
-      ),*/
-      /*const Text(
-        'Index 3: Order',
-        style: optionStyle,
-      ),*/
       _OrderGetPage(),
-      /*const Text(
-        'Index 4: My',
-        style: optionStyle,
-      ),*/
       _UserPage(this.userID),
     ];
   }
@@ -112,10 +97,6 @@ class _BottomSelectionState extends State<_BottomSelection> {
           BottomNavigationBarItem(
             icon: Icon(Icons.home),
             label: 'Home',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.local_fire_department),
-            label: 'Hot Dishes',
           ),
           BottomNavigationBarItem(
             icon: Icon(Icons.format_list_bulleted),

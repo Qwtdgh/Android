@@ -10,8 +10,10 @@ class _CanteenPage extends StatelessWidget {
       ),
       initialRoute: '/canteen',
       routes: {
-        '/': (context) => _Canteen_Root(),
-        '/canteendisplay': (context, {arguments}) => _CanteenInfo(),
+        '/canteen': (context) => _Canteen_Root(),
+        '/canteen/canteendisplay': (context, {arguments}) => _CanteenInfo(),
+        '/canteen/dishdisplay': (context, {arguments}) => _DishInfo(),
+        '/cart': (context) => _Shopping_Cart(),
         // '/receive': (context) => const _Order_ReceiveRoute(),
       },
     );
@@ -22,7 +24,7 @@ class _Canteen_Root extends StatelessWidget {
   _Canteen_Root({Key? key}) : super(key: key);
   CanteenInfo canteenInfo = const CanteenInfo(
     canteenImgUrl:
-    'https://img1.baidu.com/it/u=2263776819,1940511170&fm=26&fmt=auto',
+        'https://img1.baidu.com/it/u=2263776819,1940511170&fm=26&fmt=auto',
     canteenName: '合一食堂',
     canteenAddr: '校园北路',
     canteenTel: '010-82638192',
@@ -37,13 +39,7 @@ class _Canteen_Root extends StatelessWidget {
           backgroundColor: Colors.yellow,
         ),
         body: Center(
-          child: GridView.builder(
-            gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-              crossAxisCount: 2,
-              mainAxisSpacing: 1.0,
-              crossAxisSpacing: 1.0,
-              childAspectRatio: 1.0,
-            ),
+          child: ListView.builder(
             itemBuilder: (context, index) {
               return _CanteenCard(data: canteenInfo);
             },
@@ -64,7 +60,8 @@ class _CanteenCard extends StatelessWidget {
   Widget build(BuildContext context) {
     return GestureDetector(
       onTap: () {
-        Navigator.pushNamed(context, '/canteendisplay', arguments: data);
+        Navigator.pushNamed(context, '/canteen/canteendisplay',
+            arguments: data);
       },
       child: Container(
         margin: const EdgeInsets.fromLTRB(16, 13, 16, 10),

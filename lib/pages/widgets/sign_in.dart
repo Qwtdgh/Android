@@ -180,7 +180,7 @@ class _SignInState extends State<SignIn> {
 
                     var baseUrl = "http://delivery.mcatk.com";
                     var uri = "/api/login/";
-                    var body ={"userName": loginNameController.text, "userPassword": loginPasswordController.text};
+                    var body = {"userName": loginNameController.text, "userPassword": loginPasswordController.text};
                     http.Response response = await http.post(Uri.parse(baseUrl + uri), body: Convert.jsonEncode(body));
                     final statusCode = response.statusCode;
                     final responseBody = response.body;

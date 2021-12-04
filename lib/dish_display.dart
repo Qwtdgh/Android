@@ -50,19 +50,7 @@ class _DishInfoPage extends StatelessWidget {
           renderStars(), // Star
           renderMyStars(), // My Stars
           renderAddToChart(), // Button
-          Container(
-            padding: const EdgeInsets.fromLTRB(16, 0, 0, 0),
-            child: const Text(
-              'Comments:',
-              style: TextStyle(
-                fontStyle: FontStyle.italic,
-                fontSize: 20,
-                fontWeight: FontWeight.w700,
-                color: Colors.black,
-              ),
-            ),
-          ),
-          renderComment(), // ListView
+          renderComment(context), // ListView
         ],
       ),
     );
@@ -89,10 +77,50 @@ class _DishInfoPage extends StatelessWidget {
             ),
             child: ClipRRect(
               borderRadius: BorderRadius.circular(8),
-              child: Image.network(
-                data.dishImgUrl,
-                height: 150,
-                fit: BoxFit.cover,
+              child: Stack(
+                fit: StackFit.passthrough,
+                children: <Widget>[
+                  Image.network(
+                    data.dishImgUrl,
+                    height: 150,
+                    fit: BoxFit.cover,
+                  ),
+                  Positioned(
+                    left: 0,
+                    right: 0,
+                    bottom: 0,
+                    height: 100,
+                    child: Container(
+                        // padding: const EdgeInsets.fromLTRB(10, 0, 10, 10),
+                        alignment: Alignment.bottomRight,
+                        decoration: const BoxDecoration(
+                          gradient: LinearGradient(
+                            begin: Alignment.topCenter,
+                            end: Alignment.bottomCenter,
+                            colors: [Colors.transparent, Colors.black54],
+                          ),
+                        ),
+                        child: Container(
+                          padding: const EdgeInsets.only(left: 5.0),
+                          height: 40.0,
+                          width: 40.0,
+                          decoration: const BoxDecoration(
+                            borderRadius: BorderRadius.only(
+                              topLeft: Radius.circular(20.0),
+                            ),
+                            color: Color(0xFFF76765),
+                          ),
+                          child: Center(
+                              child: TextButton(
+                            child: const Icon(
+                              Icons.favorite_border,
+                              color: Colors.white,
+                            ),
+                            onPressed: () {},
+                          )),
+                        )),
+                  ),
+                ],
               ),
             ),
           ),
@@ -132,7 +160,7 @@ class _DishInfoPage extends StatelessWidget {
 
   Widget renderStars() {
     return Container(
-      margin: const EdgeInsets.all(10),
+      margin: const EdgeInsets.all(5),
       // constraints: const BoxConstraints.expand(),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.center,
@@ -165,7 +193,7 @@ class _DishInfoPage extends StatelessWidget {
 
   Widget renderMyStars() {
     return Container(
-      margin: const EdgeInsets.all(10),
+      margin: const EdgeInsets.all(5),
       // constraints: const BoxConstraints.expand(),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.center,
@@ -197,30 +225,76 @@ class _DishInfoPage extends StatelessWidget {
   }
 
   Widget renderAddToChart() {
-    return Container(
-        margin: const EdgeInsets.all(1),
-        padding: const EdgeInsets.all(10),
-        // constraints: const BoxConstraints.expand(),
-        child: ElevatedButton(
-
-          child: const Text("下单"),
-          style: ElevatedButton.styleFrom(
-            primary: Colors.red,
-            padding: const EdgeInsets.all(8),
-            shadowColor: Colors.grey,
-            textStyle: const TextStyle(
-              fontSize: 20,
-              color: Colors.yellow,
-            ),
+    return Row(mainAxisAlignment: MainAxisAlignment.spaceEvenly, children: [
+      Container(
+        constraints: const BoxConstraints(minHeight: 50, minWidth: 250),
+        alignment: Alignment.bottomLeft,
+        // padding: const EdgeInsets.fromLTRB(16, 0, 0, 0),
+        child: const Text(
+          'Comments:',
+          style: TextStyle(
+            fontStyle: FontStyle.italic,
+            fontSize: 20,
+            fontWeight: FontWeight.w700,
+            color: Colors.black,
           ),
-          onPressed: () {},
-        ));
+        ),
+      ),
+      Container(
+          constraints: const BoxConstraints(minHeight: 50, minWidth: 20),
+          alignment: Alignment.topRight,
+          margin: const EdgeInsets.all(1),
+          // padding: const EdgeInsets.all(10),
+          // constraints: const BoxConstraints.expand(),
+          child: ElevatedButton(
+            child: const Icon(Icons.add_shopping_cart),
+            style: ElevatedButton.styleFrom(
+              shape: const CircleBorder(),
+              primary: Colors.red,
+              padding: const EdgeInsets.all(8),
+              shadowColor: Colors.grey,
+              textStyle: const TextStyle(
+                fontSize: 20,
+                color: Colors.yellow,
+              ),
+            ),
+            onPressed: () {},
+          )),
+    ]);
   }
 
-  Widget renderComment() {
+  Widget renderComment(BuildContext context) {
     return Container(
       padding: const EdgeInsets.all(15.0),
-      child: _CommentDisplay(comments: data.comments),
+      child: Stack(
+        fit: StackFit.passthrough,
+        children: <Widget>[
+          _CommentDisplay(comments: data.comments),
+          Positioned(
+            left: 0,
+            right: 0,
+            bottom: 0,
+            height: 100,
+            child: Container(
+              padding: const EdgeInsets.fromLTRB(10, 0, 10, 10),
+              alignment: Alignment.bottomRight,
+              decoration: const BoxDecoration(
+                gradient: LinearGradient(
+                  begin: Alignment.topCenter,
+                  end: Alignment.bottomCenter,
+                  colors: [Colors.transparent, Colors.black54],
+                ),
+              ),
+              child: ElevatedButton(
+                onPressed: () {
+                  Navigator.pushNamed(context, '/cart');
+                },
+                child: const Icon(Icons.shopping_cart),
+              ),
+            ),
+          ),
+        ],
+      ),
     );
   }
 }
@@ -238,7 +312,7 @@ class _CommentDisplay extends StatelessWidget {
     return Container(
       color: const Color(0xFFEFEFEF),
       child: SizedBox(
-        height: 100,
+        height: 150,
         child: ListView.builder(
           scrollDirection: Axis.vertical,
           shrinkWrap: true,

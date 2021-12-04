@@ -17,13 +17,15 @@ class _UserPage extends StatelessWidget {
       routes: {
         "/": (context) => Myself(this.userID),
         "/personalInfo": (context) => PersonalInfo(),
-        "/sendOrder": (context, {arguments}) => _Order_SendRoute(),
-        "/receiveOrder": (context, {arguments}) => _Order_ReceiveRoute(),
+        "/sendOrder": (context) => _Order_SendRoute(),
+        "/receiveOrder": (context) => _Order_ReceiveRoute(this.userID),
         "/wallet": (context) => Wallet(),
       },
     );
   }
 }
+
+
 
 class MyselfListState extends State<MyselfList> {
   late int userID = -1;
@@ -37,7 +39,7 @@ class MyselfListState extends State<MyselfList> {
     this.userID = userID;
   }
 
-  getAll(BuildContext context) async {
+  getAll() async {
     // CustomSnackBar(context, const Text('Login button pressed'));
 
     var baseUrl = "http://delivery.mcatk.com";
@@ -68,7 +70,7 @@ class MyselfListState extends State<MyselfList> {
   @override
   Widget build(BuildContext context) {
 
-    getAll(context);
+    getAll();
 
     Card _normalCard() {
       return Card(
@@ -424,6 +426,9 @@ class Myself extends StatelessWidget {
   }
 }
 
+
+
+
 class PersonalInfo extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
@@ -497,19 +502,7 @@ class Wallet extends StatelessWidget {
     );
   }
 }
-// // //
-// // //
-// // //
-// import 'package:flutter/material.dart';
-//
 
-// import 'dart:ffi';
-//
-// import 'package:flutter/material.dart';
-//
-// void main() {
-//   runApp(new ExpansionPanelPage());
-// }
 
 class Item {
   Item({
@@ -523,9 +516,7 @@ class Item {
   bool isExpanded;
 }
 
-// var map = {{"2021/11/12": "DeliverA"},
-//   "2021/12/01": "DeliverB",
-//   "2021/12/01": "DeliverC",};
+
 
 List<Item> generateItems(int numberOfItems) {
   return List.generate(numberOfItems, (int index) {
@@ -536,12 +527,9 @@ List<Item> generateItems(int numberOfItems) {
   });
 }
 
-// class HistoryOrder extends StatefulWidget {
-//   HistoryOrder({Key? key}) : super(key: key);
-//
-//   @override
-//   _ExpansionPanelPageState createState() => _ExpansionPanelPageState();
-// }
+
+
+
 
 class MyList extends StatefulWidget {
 
@@ -687,31 +675,40 @@ class _Order_SendRoute extends StatelessWidget {
   }
 }
 
+
+
+
+
 class ExpansionList extends StatefulWidget {
 
 
-  late List receiveOrders = [];
-  
-  ExpansionList(List receiveOrders) {
-    this.receiveOrders = receiveOrders;  
+  late int userID = -1;
+  late List isExpands = [];
+
+  ExpansionList(int userID, List isExpands) {
+    this.userID = userID;
+    this.isExpands = isExpands;
   }
   
   @override
   State createState() {
-    return ExpansionListState(this.receiveOrders);
+    return ExpansionListState(this.userID, this.isExpands);
   }
 }
 
 class ExpansionListState extends State<ExpansionList> {
 
   
+  late int userID = -1;
   late List receiveOrders = [];
+  late List isExpands = [];
   
-  ExpansionListState(List receiveOrders) {
-    this.receiveOrders = receiveOrders;
-
-
+  ExpansionListState(int userID, List isExpands) {
+    this.userID = userID;
+    this.isExpands = isExpands;
   }
+
+
 
   // final List<Map<String, String>> receiveOrders = [
   //   {
@@ -814,11 +811,35 @@ class ExpansionListState extends State<ExpansionList> {
   //     "isExpanded": "0"
   //   },
   // ];
-  final List<int> mlist = [1, 2, 3];
+  getReceive() async {
+    // CustomSnackBar(context, const Text('Login button pressed'));
+    int length = 0;
+    var baseUrl = "http://delivery.mcatk.com";
+    var uri = "/api/getInformation/";
+    var body = {"userID": this.userID.toString()};
+    http.Response response = await http.post(Uri.parse(baseUrl + uri), body: Convert.jsonEncode(body));
+    final statusCode = response.statusCode;
+    final responseBody = response.body;
+    var result = Convert.jsonDecode(responseBody);
+    print('[uri=$uri][statusCode=$statusCode][response=$responseBody]');
+    this.receiveOrders = result["userOrders"];
+    setState(() {
+      this.receiveOrders = result["userOrders"];
+      this.receiveOrders.removeWhere((element) => element["orderCompleted"] == 1);
+    });
+  }
 
+  @override
+  // void initState() {
+  //   super.initState();
+  //   getReceive();
+  //   this.receiveOrders =
+  // }
 
   @override
   Widget build(BuildContext context) {
+
+    getReceive();
 
     Widget _header(item) {
       return SizedBox(
@@ -830,14 +851,14 @@ class ExpansionListState extends State<ExpansionList> {
               children: [
                 Expanded(
                   child: Text(
-                    '${item["foodname"]}',
+                    '${item["storeName"]}',
                     textAlign: TextAlign.left,
                     style: const TextStyle(fontSize: 16.0),
                   ),
                 ),
                 Expanded(
                   child: Text(
-                    '${item["time"]}',
+                    '${item["orderDate"]}',
                     textAlign: TextAlign.right,
                     style: const TextStyle(fontSize: 16.0),
                   ),
@@ -850,36 +871,90 @@ class ExpansionListState extends State<ExpansionList> {
     }
 
     Widget _expand(item) {
+
       return Column(
         children: [
           const Divider(
             thickness: 1.0,
           ),
+
           Container(
-            alignment: Alignment.centerLeft,
-            margin: const EdgeInsets.only(top: 10.0),
-            child: Text(
-              '起始：${item["shop"]}',
-            ),
+            child: ListView.builder(
+                shrinkWrap: true,
+                itemCount: item["food"].length,
+                itemBuilder: (BuildContext context, int index) {
+                  return Container(
+                    child: Row(
+                      children: [
+                        
+                        Container(
+                          width: 100.0,
+                          alignment: Alignment.centerLeft,
+                          margin: EdgeInsets.only(left: 5.0, top: 20.0),
+                          child: Column(
+                            children: [
+                              Image.network('${item["food"][index]["foodUrl"]}', height: 80.0,),
+                            ],
+                          ),
+                        ),
+                        SizedBox(width: 10.0,),
+                        Expanded(
+                            child: Column(
+                              children: [
+                                SizedBox(height: 20.0,),
+                                Container(
+                                  child: Text(
+                                    '${item["food"][index]["foodName"]}',
+                                    textAlign: TextAlign.left,
+                                  ),
+                                ),
+                                SizedBox(height: 30.0,),
+                                Container(
+                                  child: Row(
+                                    children: [
+                                      Expanded(
+                                          child: Text(
+                                              '单价：${item["food"][index]["foodPrice"]}',
+                                              textAlign: TextAlign.left,
+                                          )
+                                      ),
+                                      Expanded(
+                                          child:Text(
+                                              '数量：${item["food"][index]["foodNum"]}',
+                                              textAlign: TextAlign.right,
+                                      )
+                                      )
+                                    ],
+                                  ),
+                                )
+                              ],
+                            )
+                        ),
+
+                      ],
+                    ),
+                  );
+
+                }),
           ),
           Container(
             alignment: Alignment.centerLeft,
             margin: const EdgeInsets.only(top: 10.0),
             child: Text(
-              '价格：${item["foodprice"]}元',
+              '总价格：${item["totalPrice"]}元',
             ),
           ),
           Container(
               alignment: Alignment.centerLeft,
               margin: const EdgeInsets.only(top: 10.0),
               child: Text(
-                '骑手：${item["delivername"]}',
+                '骑手：${item["deliveryUserName"]}',
               )),
           Container(
             alignment: Alignment.centerLeft,
             margin: const EdgeInsets.only(top: 10.0),
             child: Text(
-              '联系电话：${item["phone"]}',
+              '联系电话：${item["deliveryUserTel"]}',
             ),
           ),
           Container(
@@ -898,13 +973,14 @@ class ExpansionListState extends State<ExpansionList> {
     }
 
     Widget _buildPanel() {
+
       return ExpansionPanelList(
         expansionCallback: (int index, bool isExpanded) {
           setState(() {
-            if (receiveOrders[index]["isExpanded"] == "0") {
-              receiveOrders[index]["isExpanded"] = "1";
+            if (isExpands[index]) {
+              isExpands[index] = false;
             } else {
-              receiveOrders[index]["isExpanded"] = "0";
+              isExpands[index] = true;
             }
           });
         },
@@ -914,7 +990,7 @@ class ExpansionListState extends State<ExpansionList> {
               return _header(item);
             },
             body: _expand(item),
-            isExpanded: item["isExpanded"] == "0" ? false : true,
+            isExpanded: isExpands[receiveOrders.indexOf(item)] ? true : false,
             canTapOnHeader: false,
           );
         }).toList(),
@@ -922,10 +998,10 @@ class ExpansionListState extends State<ExpansionList> {
     }
 
     return Container(
-        alignment: Alignment.center,
+
         child: SingleChildScrollView(
           child: Container(
-              margin: const EdgeInsets.only(left: 10.0, right: 10.0, top: 10.0),
+              margin: const EdgeInsets.only(left: 10.0, right: 10.0, top: 0),
               decoration: BoxDecoration(
                   //border: new Border.all(color: Color(0xFF3E3737), width: 2),
                   color: const Color(0xFFFFFFFF),
@@ -942,18 +1018,23 @@ class ExpansionListState extends State<ExpansionList> {
 class _Order_ReceiveRoute extends StatelessWidget {
 
 
-  late List receiveOrders = [];
-
+  late int userID = -1;
+  late List isExpands = [];
+  _Order_ReceiveRoute(int userID) {
+    this.userID = userID;
+    for (int i = 0; i < 1000; i++) {
+      this.isExpands.add(false);
+    }
+  }
 
 
   @override
   Widget build(BuildContext context) {
-    receiveOrders = ModalRoute.of(context)!.settings.arguments as List;
     return Scaffold(
       appBar: AppBar(
         title: const Text("收餐"),
       ),
-      body: Center(child: ExpansionList(receiveOrders)),
+      body: Center(child: ExpansionList(this.userID, this.isExpands)),
     );
   }
 }

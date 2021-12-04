@@ -3,6 +3,10 @@ part of main;
 class _Shopping_Cart extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
+    var shoppingList = ModalRoute
+        .of(context)!
+        .settings
+        .arguments as List<DishInfo>;
     return Scaffold(
       appBar: AppBar(
         title: const Text('Shopping Cart'),
@@ -17,8 +21,8 @@ class _Shopping_Cart extends StatelessWidget {
           ),
         ],
       ),
-      body: const Center(
-        child: _CartBody(),
+      body: Center(
+        child: _CartBody(shoppingList),
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () {
@@ -32,56 +36,63 @@ class _Shopping_Cart extends StatelessWidget {
 }
 
 class _CartBody extends StatelessWidget {
-  const _CartBody({Key? key}) : super(key: key);
+  late List<DishInfo> shoppingList;
+  _CartBody(this.shoppingList);
 
   @override
   Widget build(BuildContext context) {
-    return _GuessYouLikePage();
+    return _GuessYouLikePage(shoppingList);
   }
 }
 
 class _GuessYouLikePage extends StatefulWidget {
+  late List<DishInfo> shoppingList;
+  _GuessYouLikePage(this.shoppingList);
+
   @override
-  _GuessYouLikePageState createState() => _GuessYouLikePageState();
+  _GuessYouLikePageState createState() => _GuessYouLikePageState(shoppingList);
 }
 
 class _GuessYouLikePageState extends State<_GuessYouLikePage> {
+  late List<DishInfo> shoppingList;
+  _GuessYouLikePageState(this.shoppingList);
   @override
   Widget build(BuildContext context) {
-    return ListView(
-      children: <Widget>[
-        SizedBox(height: 25.0),
-        getFoodItem(
-            'Chicken Chow Mein',
-            'https://gimg2.baidu.com/image_search/src=http%3A%2F%2Fimgsa.baidu.com%2Fexp%2Fw%3D500%2Fsign%3D449be3d66381800a6ee5890e813433d6%2F8694a4c27d1ed21b9b3734bca26eddc450da3fe8.jpg&refer=http%3A%2F%2Fimgsa.baidu.com&app=2002&size=f9999,10000&q=a80&n=0&g=0n&fmt=jpeg?sec=1640937777&t=f86139b4672f345a1a881cc08deb4aeb',
-            123,
-            '合一食堂',
-            5),
-        SizedBox(height: 25.0),
-        Padding(
-          padding: const EdgeInsets.only(left: 125.0),
-          child: Container(height: 1.0, color: Colors.grey),
-        ),
-        const SizedBox(height: 15.0),
-        getFoodItem(
-            'Beef vermicelli soup',
-            'https://gimg2.baidu.com/image_search/src=http%3A%2F%2Fimgsa.baidu.com%2Fexp%2Fw%3D500%2Fsign%3D449be3d66381800a6ee5890e813433d6%2F8694a4c27d1ed21b9b3734bca26eddc450da3fe8.jpg&refer=http%3A%2F%2Fimgsa.baidu.com&app=2002&size=f9999,10000&q=a80&n=0&g=0n&fmt=jpeg?sec=1640937777&t=f86139b4672f345a1a881cc08deb4aeb',
-            123,
-            '合一食堂',
-            4),
-        const SizedBox(height: 25.0),
-        Padding(
-          padding: const EdgeInsets.only(left: 100.0),
-          child: Container(
-            height: 1.0,
-            color: Colors.grey,
+    return ListView.builder(
+      itemCount: shoppingList.length,
+      itemBuilder: (BuildContext context, int index) {
+        return _shopping_card(shoppingList[index]);
+      },
+    );
+  }
+}
+
+class _shopping_card extends StatelessWidget {
+  late DishInfo shoppingDish;
+  _shopping_card(this.shoppingDish);
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+        children: [
+          SizedBox(height: 25.0),
+          getFoodItem(
+            context,
+              shoppingDish.dishName,
+              shoppingDish.dishImgUrl,
+              shoppingDish.dishPrice,
+              shoppingDish.dishPlace,
+              5),
+          SizedBox(height: 25.0),
+          Padding(
+            padding: const EdgeInsets.only(left: 125.0),
+            child: Container(height: 1.0, color: Colors.grey),
           ),
-        ),
-      ],
+        ]
     );
   }
 
-  getFoodItem(String dishName, String imgUrl, int price, String canteen,
+  Widget getFoodItem(BuildContext context, String dishName, String imgUrl, int price, String canteen,
       int num) {
     return Padding(
         padding: const EdgeInsets.only(left: 15.0),
@@ -104,7 +115,10 @@ class _GuessYouLikePageState extends State<_GuessYouLikePage> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: <Widget>[
                 Container(
-                    width: MediaQuery.of(context).size.width - 125.0,
+                    width: MediaQuery
+                        .of(context)
+                        .size
+                        .width - 125.0,
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: <Widget>[
@@ -147,3 +161,4 @@ class _GuessYouLikePageState extends State<_GuessYouLikePage> {
         ));
   }
 }
+

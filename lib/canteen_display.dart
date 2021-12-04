@@ -5,10 +5,7 @@ class _CanteenInfo extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    data = ModalRoute
-        .of(context)!
-        .settings
-        .arguments as CanteenInfo;
+    data = ModalRoute.of(context)!.settings.arguments as CanteenInfo;
     return Scaffold(
       appBar: AppBar(
         title: Text(data.canteenName),
@@ -169,7 +166,7 @@ class _MenuRoot extends StatelessWidget {
   _MenuRoot({Key? key}) : super(key: key);
   DishInfo dishInfo = const DishInfo(
     dishImgUrl:
-    'https://gimg2.baidu.com/image_search/src=http%3A%2F%2Fimgsa.baidu.com%2Fexp%2Fw%3D500%2Fsign%3D449be3d66381800a6ee5890e813433d6%2F8694a4c27d1ed21b9b3734bca26eddc450da3fe8.jpg&refer=http%3A%2F%2Fimgsa.baidu.com&app=2002&size=f9999,10000&q=a80&n=0&g=0n&fmt=jpeg?sec=1640937777&t=f86139b4672f345a1a881cc08deb4aeb',
+        'https://gimg2.baidu.com/image_search/src=http%3A%2F%2Fimgsa.baidu.com%2Fexp%2Fw%3D500%2Fsign%3D449be3d66381800a6ee5890e813433d6%2F8694a4c27d1ed21b9b3734bca26eddc450da3fe8.jpg&refer=http%3A%2F%2Fimgsa.baidu.com&app=2002&size=f9999,10000&q=a80&n=0&g=0n&fmt=jpeg?sec=1640937777&t=f86139b4672f345a1a881cc08deb4aeb',
     dishName: '宫保鸡丁',
     dishPlace: '合一食堂',
     dishPrice: 30000,

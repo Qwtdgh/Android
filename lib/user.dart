@@ -17,14 +17,115 @@ class _UserPage extends StatelessWidget {
       routes: {
         "/": (context) => Myself(this.userID),
         "/personalInfo": (context) => PersonalInfo(),
+        "/likes": (context) => _Home_Root1(this.userID),
         "/sendOrder": (context) => _Order_SendRoute(this.userID),
         "/receiveOrder": (context) => _Order_ReceiveRoute(this.userID),
-        "/wallet": (context) => Wallet(),
       },
     );
   }
 }
 
+
+class HomeRootList extends StatefulWidget {
+  late int userID = -1;
+
+  HomeRootList(int userID) {
+    this.userID = userID;
+  }
+
+  @override
+  createState() => _Home_RootState(this.userID);
+}
+
+
+class _Home_RootState extends State<HomeRootList> {
+  //_Home_Root({Key? key}) : super(key: key);
+  late int userID = -1;
+  List stars = [];
+  _Home_RootState(int userID) {
+    this.userID = userID;
+  }
+
+
+  getAll(BuildContext context) async {
+    // CustomSnackBar(context, const Text('Login button pressed'));
+
+    var baseUrl = "http://delivery.mcatk.com";
+    var uri = "/api/get_stars/";
+    var body = {"userID": this.userID.toString()};
+    http.Response response = await http.post(Uri.parse(baseUrl + uri), body: Convert.jsonEncode(body));
+    final statusCode = response.statusCode;
+    final responseBody = response.body;
+    var result = Convert.jsonDecode(responseBody);
+    print('[uri=$uri][statusCode=$statusCode][response=$responseBody]');
+
+    //var http =  HttpRequest("http://delivery.mcatk.com");
+
+    //Map<String, String> ret = http.post("/api/login/", body) as Map<String, String>;
+    //String? userID = ret["userID"];
+    var userID = result["userID"];
+    print(userID);
+    setState(() {
+      this.stars = result;
+
+    });
+    // Navigator.pushNamed(context, "/main", arguments: userID);
+  }
+
+
+  // DishInfo dishInfo = const DishInfo(
+  //   dishImgUrl:
+  //   'https://gimg2.baidu.com/image_search/src=http%3A%2F%2Fimgsa.baidu.com%2Fexp%2Fw%3D500%2Fsign%3D449be3d66381800a6ee5890e813433d6%2F8694a4c27d1ed21b9b3734bca26eddc450da3fe8.jpg&refer=http%3A%2F%2Fimgsa.baidu.com&app=2002&size=f9999,10000&q=a80&n=0&g=0n&fmt=jpeg?sec=1640937777&t=f86139b4672f345a1a881cc08deb4aeb',
+  //   dishName: '宫保鸡丁',
+  //   dishPlace: '合一食堂',
+  //   dishPrice: 30000,
+  //   comments: ['Great', 'Garbage', 'Huge', 'Huge', 'Huge', 'Huge', 'Huge', 'Huge', 'Huge', 'Huge', 'Huge', 'Huge', 'Huge', 'Huge', 'Huge', 'Huge', 'Huge', 'Huge', 'Huge', 'Huge'],
+  // );
+
+  @override
+  Widget build(BuildContext context) {
+    getAll(context);
+    return Scaffold(
+        // appBar: AppBar(
+        //   title: const Text('Home'),
+        //   foregroundColor: Colors.black,
+        //   backgroundColor: Colors.yellow,
+        // ),
+        body: Center(
+          child: GridView.builder(
+            gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+              crossAxisCount: 1,
+              mainAxisSpacing: 1.0,
+              crossAxisSpacing: 1.0,
+              childAspectRatio: 1.0,
+            ),
+            itemBuilder: (context, index) {
+              return _SuggestedDishCard(stars[index], userID);
+            },
+          ),
+        ));
+  }
+}
+
+class _Home_Root1 extends StatelessWidget {
+  late int userID;
+
+  _Home_Root1(int userID) {
+    this.userID = userID;
+  }
+
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: Text("Myself"),
+      ),
+      backgroundColor: Color(0xfff7c341),
+      body: HomeRootList(this.userID),
+    );
+  }
+}
 
 
 class MyselfListState extends State<MyselfList> {
@@ -34,6 +135,7 @@ class MyselfListState extends State<MyselfList> {
   late String userTel = "";
   late List sendOrders = [];
   late List receiveOrders = [];
+  late List likes = [];
 
   MyselfListState(int userID) {
     this.userID = userID;
@@ -42,7 +144,7 @@ class MyselfListState extends State<MyselfList> {
   getAll() async {
     // CustomSnackBar(context, const Text('Login button pressed'));
 
-    var baseUrl = "http://delivery.mcatk.com";
+    var baseUrl = "http://42.192.60.125";
     var uri = "/api/getInformation/";
     var body = {"userID": this.userID.toString()};
     http.Response response = await http.post(Uri.parse(baseUrl + uri), body: Convert.jsonEncode(body));
@@ -189,6 +291,17 @@ class MyselfListState extends State<MyselfList> {
     }
 
     Card _shapeCard0(BuildContext context, String str, String route) {
+      bool flag0 = true,flag1 = true,flag2=true;
+      if (this.sendOrders.isEmpty){
+        flag0 = false;
+      }
+      if (this.receiveOrders.isEmpty){
+        flag1 = false;
+      }
+      if (this.likes.isEmpty){
+        flag2 = false;
+      }
+
       return Card(
         color: Colors.white, // 背景色
         // shadowColor: Colors.white, // 阴影颜色
@@ -215,7 +328,7 @@ class MyselfListState extends State<MyselfList> {
               children: <Widget>[
                 Badge(
                   //文本内容Text为空时子组件为null时则返回一个红点，其他值时按实际显示
-                  badgeContent: Text(""),
+                  badgeContent: Text('${this.sendOrders.length}'),
                   child: Container(
                       height: 80,
                       width: 40,
@@ -244,7 +357,7 @@ class MyselfListState extends State<MyselfList> {
                   //子组件
                   badgeColor: Colors.red,
                   //右上角小红点颜色（默认时为红色）
-                  showBadge: true,
+                  showBadge: flag0,
                   //true时刷新时会在右则摆动一下
                   animationDuration: Duration(seconds: 10),
                   //小点点在右侧摆动的时间,这里为10秒
@@ -263,7 +376,7 @@ class MyselfListState extends State<MyselfList> {
                 // ),
                 Badge(
                   //文本内容Text为空时子组件为null时则返回一个红点，其他值时按实际显示
-                  badgeContent: Text(""),
+                  badgeContent: Text('${this.receiveOrders.length}'),
                   child: Container(
                       height: 80,
                       width: 40,
@@ -291,7 +404,7 @@ class MyselfListState extends State<MyselfList> {
                   //子组件
                   badgeColor: Colors.red,
                   //右上角小红点颜色（默认时为红色）
-                  showBadge: true,
+                  showBadge: flag1,
                   //true时刷新时会在右则摆动一下
                   animationDuration: Duration(seconds: 10),
                   //小点点在右侧摆动的时间,这里为10秒
@@ -299,7 +412,7 @@ class MyselfListState extends State<MyselfList> {
                 ),
                 Badge(
                   //文本内容Text为空时子组件为null时则返回一个红点，其他值时按实际显示
-                  badgeContent: Text(""),
+                  badgeContent: Text('${this.likes.length}'),
                   child: Container(
                       height: 80,
                       width: 40,
@@ -307,7 +420,7 @@ class MyselfListState extends State<MyselfList> {
                         children: <Widget>[
                           IconButton(
                             onPressed: () {
-                              Navigator.pushNamed(context, "/receiveOrder");
+                              Navigator.pushNamed(context, "/likes");
                             },
                             icon: Icon(
                               Icons.star,
@@ -327,22 +440,12 @@ class MyselfListState extends State<MyselfList> {
                   //子组件
                   badgeColor: Colors.red,
                   //右上角小红点颜色（默认时为红色）
-                  showBadge: true,
+                  showBadge: flag2,
                   //true时刷新时会在右则摆动一下
                   animationDuration: Duration(seconds: 10),
                   //小点点在右侧摆动的时间,这里为10秒
                   toAnimate: true, //允许摆动，false时showBadge会失效
                 ),
-                // Badge(
-                //   //文本内容Text为空时子组件为null时则返回一个红点，其他值时按实际显示
-                //   badgeContent:Text(""),
-                //   child: Text("待配送"), //子组件
-                //   badgeColor: Colors.red,  //右上角小红点颜色（默认时为红色）
-                //   showBadge: true,//true时刷新时会在右则摆动一下
-                //   animationDuration:Duration(seconds: 10),//小点点在右侧摆动的时间,这里为10秒
-                //   toAnimate:true, //允许摆动，false时showBadge会失效
-                //
-                // ),
               ],
             )),
       );
@@ -354,39 +457,6 @@ class MyselfListState extends State<MyselfList> {
       //padding: EdgeInsets.all(15),
       children: [
         _normalCard(),
-        // Row(
-        //   children: <Widget>[
-        //     // CircleAvatar(
-        //     //   // 宽高不一致为，裁剪后为椭圆形
-        //     //   child: Container(
-        //     //     height: 100,
-        //     //     width: 150,
-        //     //     child: Image.asset(
-        //     //       "images/login/login_logo.png",
-        //     //       fit: BoxFit.cover,
-        //     //     ),
-        //     //   ),
-        //     // ),
-        //
-        //     Container(
-        //         width: 100,
-        //         height: 100,
-        //         decoration: ShapeDecoration(
-        //             shape: RoundedRectangleBorder(
-        //                 borderRadius: BorderRadius.circular(16)),
-        //             image: DecorationImage(
-        //                 fit: BoxFit.cover,
-        //                 image: AssetImage("images/login/login_logo.png")))),
-        //     Text("用户昵称"),
-        //   ],
-        // ),
-
-        // Image(
-        //
-        //   fit: BoxFit.cover,
-        //   image: new AssetImage('images/login/login_logo.png'),
-        // ),
-        //Padding(padding: EdgeInsets.all(10)),
         _shapeCard(context, "个人信息", "/personalInfo"),
         _shapeCard0(context, "历史订单", "/sendOrder"),
         //_shapeCard(context,"钱包","/wallet")
@@ -425,9 +495,6 @@ class Myself extends StatelessWidget {
     );
   }
 }
-
-
-
 
 class PersonalInfo extends StatelessWidget {
   @override
@@ -481,27 +548,32 @@ class PersonalInfo extends StatelessWidget {
   }
 }
 
-class Wallet extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text("Wallet"),
-      ),
-      body: Center(
-        child: RaisedButton(
-          child: Text("跳回首页"),
-          onPressed: () {
-            Navigator.pushNamed(context, "/");
-//            Navigator.push(context, MaterialPageRoute(builder: (context) {
-//              return SecondScreen();
-//            }));
-          },
-        ),
-      ),
-    );
-  }
-}
+// class Wallet extends StatelessWidget {
+//   @override
+//   Widget build(BuildContext context) {
+//     return Scaffold(
+//       appBar: AppBar(
+//         title: Text("Wallet"),
+//       ),
+//       body: Center(
+//         child: RaisedButton(
+//           child: Text("跳回首页"),
+//           onPressed: () {
+//             Navigator.pushNamed(context, "/");
+// //            Navigator.push(context, MaterialPageRoute(builder: (context) {
+// //              return SecondScreen();
+// //            }));
+//           },
+//         ),
+//       ),
+//     );
+//   }
+// }
+// // //
+// // //
+// // //
+// import 'package:flutter/material.dart';
+//
 
 
 class Item {
@@ -800,6 +872,7 @@ class ExpansionListState extends State<ExpansionList> {
     this.userID = userID;
     this.isExpands = isExpands;
   }
+
 
 
 

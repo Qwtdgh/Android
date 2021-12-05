@@ -10,7 +10,7 @@ class _CanteenPage extends StatelessWidget {
       ),
       initialRoute: '/canteen',
       routes: {
-        '/canteen': (context) => _Canteen_Root(),
+        '/canteen': (context) => _CanteenRoot(),
         '/canteen/canteendisplay': (context, {arguments}) => _CanteenInfo(),
         '/canteen/dishdisplay': (context, {arguments}) => _DishInfo(),
         '/cart': (context) => _ShoppingCart(),
@@ -20,18 +20,33 @@ class _CanteenPage extends StatelessWidget {
   }
 }
 
-class _Canteen_Root extends StatelessWidget {
-  _Canteen_Root({Key? key}) : super(key: key);
-  CanteenInfo canteenInfo = const CanteenInfo(
-    canteenImgUrl:
-        'https://img1.baidu.com/it/u=2263776819,1940511170&fm=26&fmt=auto',
-    canteenName: '合一食堂',
-    canteenAddr: '校园北路',
-    canteenTel: '010-82638192',
-  );
+class _CanteenRoot extends StatefulWidget {
+  @override
+  _CanteenRootState createState() => _CanteenRootState();
+}
+
+class _CanteenRootState extends State<_CanteenRoot> {
+  var stores = [];
+
+  getAll(BuildContext context) async {
+    var baseUrl = "http://delivery.mcatk.com";
+    var uri = "/api/getStores/";
+    var body = {};
+    http.Response response = await http.post(Uri.parse(baseUrl + uri), body: Convert.jsonEncode(body));
+    final statusCode = response.statusCode;
+    final responseBody = response.body;
+    var result = Convert.jsonDecode(responseBody);
+    print('[uri=$uri][statusCode=$statusCode][response=$responseBody]');
+
+    setState(() {
+      stores = result["store"];
+    });
+    print(stores);
+  }
 
   @override
   Widget build(BuildContext context) {
+    getAll(context);
     return Scaffold(
         appBar: AppBar(
           title: const Text('Home'),
@@ -40,8 +55,9 @@ class _Canteen_Root extends StatelessWidget {
         ),
         body: Center(
           child: ListView.builder(
+            itemCount: stores.length,
             itemBuilder: (context, index) {
-              return _CanteenCard(data: canteenInfo);
+              return _CanteenCard(stores[index]);
             },
           ),
         ));
@@ -49,19 +65,16 @@ class _Canteen_Root extends StatelessWidget {
 }
 
 class _CanteenCard extends StatelessWidget {
-  final CanteenInfo data;
+  var store;
 
-  const _CanteenCard({
-    Key? key,
-    required this.data,
-  }) : super(key: key);
+  _CanteenCard(this.store);
 
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
       onTap: () {
         Navigator.pushNamed(context, '/canteen/canteendisplay',
-            arguments: data);
+            arguments: store);
       },
       child: Container(
         margin: const EdgeInsets.fromLTRB(16, 13, 16, 10),
@@ -86,7 +99,7 @@ class _CanteenCard extends StatelessWidget {
         fit: StackFit.passthrough,
         children: <Widget>[
           Image.network(
-            data.canteenImgUrl,
+            store['storeUrl'],
             height: 180,
             fit: BoxFit.cover,
           ),
@@ -106,7 +119,7 @@ class _CanteenCard extends StatelessWidget {
                 ),
               ),
               child: Text(
-                data.canteenName,
+                store['storeName'],
                 maxLines: 2,
                 overflow: TextOverflow.ellipsis,
                 style: const TextStyle(
@@ -121,25 +134,4 @@ class _CanteenCard extends StatelessWidget {
       ),
     );
   }
-}
-
-class CanteenInfo {
-  // dish image
-  final String canteenImgUrl;
-
-  // dish name
-  final String canteenName;
-
-  // canteen addr
-  final String canteenAddr;
-
-  // dish comments
-  final String canteenTel;
-
-  const CanteenInfo({
-    required this.canteenImgUrl,
-    required this.canteenName,
-    required this.canteenAddr,
-    required this.canteenTel,
-  });
 }

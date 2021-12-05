@@ -1,11 +1,11 @@
 part of 'main.dart';
 
 class _DishInfo extends StatelessWidget {
-  late DishInfo data;
+  late var food;
 
   @override
   Widget build(BuildContext context) {
-    data = ModalRoute.of(context)!.settings.arguments as DishInfo;
+    food = ModalRoute.of(context)!.settings.arguments;
     return Scaffold(
       appBar: AppBar(
         title: const Text('DishInfo'),
@@ -21,20 +21,17 @@ class _DishInfo extends StatelessWidget {
         ],
       ),
       body: Center(
-        child: _DishInfoPage(data: data),
+        child: _DishInfoPage(food),
       ),
     );
   }
 }
 
 class _DishInfoPage extends StatelessWidget {
-  final DishInfo data;
-  List<DishInfo> shopping_list = List.empty(growable: true);
+  late var food;
+  var shopping_list = List.empty(growable: true);
 
-  _DishInfoPage({
-    Key? key,
-    required this.data,
-  }) : super(key: key);
+  _DishInfoPage(this.food);
 
   @override
   Widget build(BuildContext context) {
@@ -82,7 +79,7 @@ class _DishInfoPage extends StatelessWidget {
                 fit: StackFit.passthrough,
                 children: <Widget>[
                   Image.network(
-                    data.dishImgUrl,
+                    food['foodUrl'],
                     height: 150,
                     fit: BoxFit.cover,
                   ),
@@ -140,15 +137,15 @@ class _DishInfoPage extends StatelessWidget {
               // verticalDirection: Ver,
               children: [
                 Text(
-                  '名称：\t' + data.dishName,
+                  '名称：\t' + food['foodName'],
                   style: textStyle,
                 ),
                 Text(
-                  '食堂：\t' + data.dishPlace,
+                  '食堂：\t' + food['foodStoreName'],
                   style: textStyle,
                 ),
                 Text(
-                  '价格：\t' + data.dishPrice.toDouble().toStringAsFixed(2),
+                  '价格：\t' + food['foodPrice'].toDouble().toStringAsFixed(2),
                   style: textStyle,
                 ),
               ],
@@ -258,7 +255,7 @@ class _DishInfoPage extends StatelessWidget {
               ),
             ),
             onPressed: () {
-              shopping_list.add(data);
+              shopping_list.add(food);
             },
           )),
     ]);
@@ -270,7 +267,7 @@ class _DishInfoPage extends StatelessWidget {
       child: Stack(
         fit: StackFit.passthrough,
         children: <Widget>[
-          _CommentDisplay(comments: data.comments),
+          _CommentDisplay(comments: food['comments']),
           Positioned(
             left: 0,
             right: 0,
@@ -288,7 +285,8 @@ class _DishInfoPage extends StatelessWidget {
               ),
               child: ElevatedButton(
                 onPressed: () {
-                  Navigator.pushNamed(context, '/cart', arguments: shopping_list);
+                  Navigator.pushNamed(context, '/cart',
+                      arguments: shopping_list);
                 },
                 child: const Icon(Icons.shopping_cart),
               ),

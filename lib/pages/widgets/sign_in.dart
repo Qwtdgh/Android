@@ -178,7 +178,7 @@ class _SignInState extends State<SignIn> {
                     CustomSnackBar(
                         context, const Text('Login button pressed'));
 
-                    var baseUrl = "http://delivery.mcatk.com";
+                    var baseUrl = "http://42.192.60.125";
                     var uri = "/api/login/";
                     var body = {"userName": loginNameController.text, "userPassword": loginPasswordController.text};
                     http.Response response = await http.post(Uri.parse(baseUrl + uri), body: Convert.jsonEncode(body));

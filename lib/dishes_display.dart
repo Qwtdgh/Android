@@ -1,6 +1,8 @@
 part of 'main.dart';
 
 class _HomePage extends StatelessWidget {
+  late var userID;
+  _HomePage(this.userID);
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
@@ -10,7 +12,7 @@ class _HomePage extends StatelessWidget {
       ),
       initialRoute: '/home',
       routes: {
-        '/home': (context) => _Home_Root(),
+        '/home': (context) => _HomeRoot(userID),
         '/home/dishdisplay': (context, {arguments}) => _DishInfo(),
         // '/receive': (context) => const _Order_ReceiveRoute(),
         '/cart': (context) => _ShoppingCart(),
@@ -19,19 +21,37 @@ class _HomePage extends StatelessWidget {
   }
 }
 
-class _Home_Root extends StatelessWidget {
-  _Home_Root({Key? key}) : super(key: key);
-  DishInfo dishInfo = const DishInfo(
-    dishImgUrl:
-        'https://gimg2.baidu.com/image_search/src=http%3A%2F%2Fimgsa.baidu.com%2Fexp%2Fw%3D500%2Fsign%3D449be3d66381800a6ee5890e813433d6%2F8694a4c27d1ed21b9b3734bca26eddc450da3fe8.jpg&refer=http%3A%2F%2Fimgsa.baidu.com&app=2002&size=f9999,10000&q=a80&n=0&g=0n&fmt=jpeg?sec=1640937777&t=f86139b4672f345a1a881cc08deb4aeb',
-    dishName: '宫保鸡丁',
-    dishPlace: '合一食堂',
-    dishPrice: 30000,
-    comments: ['Great', 'Garbage', 'Huge', 'Huge', 'Huge', 'Huge', 'Huge', 'Huge', 'Huge', 'Huge', 'Huge', 'Huge', 'Huge', 'Huge', 'Huge', 'Huge', 'Huge', 'Huge', 'Huge', 'Huge'],
-  );
+class _HomeRoot extends StatefulWidget {
+  late var userID;
+  _HomeRoot(this.userID);
+
+  @override
+  _HomeRootState createState() => _HomeRootState(userID);
+}
+
+class _HomeRootState extends State<_HomeRoot> {
+  var topFoodList = [];
+  late var userID;
+  _HomeRootState(this.userID);
+  getAll(BuildContext context) async {
+    var baseUrl = "http://delivery.mcatk.com";
+    var uri = "/api/getTopFoodList/";
+    var body = {};
+    http.Response response = await http.post(Uri.parse(baseUrl + uri), body: Convert.jsonEncode(body));
+    final statusCode = response.statusCode;
+    final responseBody = response.body;
+    var result = Convert.jsonDecode(responseBody);
+    print('[uri=$uri][statusCode=$statusCode][response=$responseBody]');
+
+    setState(() {
+      topFoodList = result["food"];
+    });
+    print(topFoodList);
+  }
 
   @override
   Widget build(BuildContext context) {
+    getAll(context);
     return Scaffold(
         appBar: AppBar(
           title: const Text('Home'),
@@ -46,8 +66,9 @@ class _Home_Root extends StatelessWidget {
               crossAxisSpacing: 1.0,
               childAspectRatio: 1.0,
             ),
+            itemCount: topFoodList.length,
             itemBuilder: (context, index) {
-              return _SuggestedDishCard(data: dishInfo);
+              return _SuggestedDishCard(topFoodList[index], userID);
             },
           ),
         ));
@@ -55,18 +76,16 @@ class _Home_Root extends StatelessWidget {
 }
 
 class _SuggestedDishCard extends StatelessWidget {
-  final DishInfo data;
+  late var userID;
+  late var topFood;
 
-  const _SuggestedDishCard({
-    Key? key,
-    required this.data,
-  }) : super(key: key);
+  _SuggestedDishCard(this.topFood, this.userID);
 
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
       onTap: () {
-        Navigator.pushNamed(context, '/home/dishdisplay', arguments: data);
+        Navigator.pushNamed(context, '/home/dishdisplay', arguments: topFood);
       },
       child: Container(
         margin: const EdgeInsets.fromLTRB(16, 13, 16, 0),
@@ -77,7 +96,7 @@ class _SuggestedDishCard extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: <Widget>[
-            renderCover(),
+            renderCover(context),
             renderCanteen(),
           ],
         ),
@@ -97,7 +116,7 @@ class _SuggestedDishCard extends StatelessWidget {
           padding: const EdgeInsets.fromLTRB(10, 10, 10, 10),
           alignment: Alignment.bottomLeft,
           child: Text(
-            data.dishPlace,
+            topFood['foodStoreName'],
             maxLines: 2,
             overflow: TextOverflow.ellipsis,
             style: const TextStyle(
@@ -111,14 +130,14 @@ class _SuggestedDishCard extends StatelessWidget {
     );
   }
 
-  Widget renderCover() {
+  Widget renderCover(BuildContext context) {
     return ClipRRect(
       borderRadius: BorderRadius.circular(8),
       child: Stack(
         fit: StackFit.passthrough,
         children: <Widget>[
           Image.network(
-            data.dishImgUrl,
+            topFood['foodUrl'],
             height: 150,
             fit: BoxFit.cover,
           ),
@@ -138,7 +157,7 @@ class _SuggestedDishCard extends StatelessWidget {
                 ),
               ),
               child: Text(
-                data.dishName,
+                topFood['foodName'],
                 maxLines: 2,
                 overflow: TextOverflow.ellipsis,
                 style: const TextStyle(
@@ -155,7 +174,7 @@ class _SuggestedDishCard extends StatelessWidget {
             bottom: 0,
             height: 100,
             child: Container(
-              // padding: const EdgeInsets.fromLTRB(10, 0, 10, 10),
+                // padding: const EdgeInsets.fromLTRB(10, 0, 10, 10),
                 alignment: Alignment.bottomRight,
                 child: Container(
                   padding: const EdgeInsets.only(left: 5.0),
@@ -169,41 +188,31 @@ class _SuggestedDishCard extends StatelessWidget {
                   ),
                   child: Center(
                       child: TextButton(
-                        child: const Icon(
-                          Icons.favorite_border,
-                          color: Colors.white,
-                        ),
-                        onPressed: () {},
-                      )),
+                    child: const Icon(
+                      Icons.favorite_border,
+                      color: Colors.white,
+                    ),
+                    onPressed: () {
+                      setAll(context);
+                    },
+                  )),
                 )),
           ),
         ],
       ),
     );
   }
-}
 
-class DishInfo {
-  // dish image
-  final String dishImgUrl;
-
-  // dish name
-  final String dishName;
-
-  // dish canteen
-  final String dishPlace;
-
-  // dish price
-  final int dishPrice;
-
-  // dish comments
-  final List<String> comments;
-
-  const DishInfo({
-    required this.dishImgUrl,
-    required this.dishName,
-    required this.dishPlace,
-    required this.dishPrice,
-    required this.comments,
-  });
+  setAll(BuildContext context) async {
+    var baseUrl = "http://delivery.mcatk.com";
+    var uri = "/api/setStar/";
+    var body = {
+      'userID': userID,
+      'foodID': topFood['foodID'],
+    };
+    http.Response response = await http.post(Uri.parse(baseUrl + uri), body: Convert.jsonEncode(body));
+    final statusCode = response.statusCode;
+    final responseBody = response.body;
+    print('[uri=$uri][statusCode=$statusCode][response=$responseBody]');
+  }
 }

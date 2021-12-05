@@ -2,6 +2,12 @@ part of main;
 
 
 class _OrderGetPage extends StatelessWidget {
+
+  late int userID = -1;
+  _OrderGetPage(int userID) {
+    this.userID = userID;
+  }
+
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
@@ -14,7 +20,7 @@ class _OrderGetPage extends StatelessWidget {
         appBar: AppBar(
           title: const Text("抢单"),
         ),
-        body: const _Order_Get_List(),
+        body: _Order_Get_List(this.userID),
       ),
     );
   }
@@ -22,36 +28,66 @@ class _OrderGetPage extends StatelessWidget {
 
 
 class _Order_Get_List extends StatefulWidget {
-  const _Order_Get_List({Key? key}) : super(key: key);
+
+  late int userID = -1;
+  _Order_Get_List(int userID) {
+    this.userID = userID;
+  }
 
   @override
-  createState() => _Order_Get_List_State();
+  createState() => _Order_Get_List_State(this.userID);
 }
 
 class _Order_Get_List_State extends State<_Order_Get_List> {
-  List<Map<String, String>> sends = [
-    {"id": "1", "d": "kk", "rp": "receiver", "time": "11/31"},
-    {"id": "2", "d": "kk", "rp": "receiver", "time": "11/31"},
-    {"id": "3", "d": "kk", "rp": "receiver", "time": "11/31"},
-    {"id": "4", "d": "kk", "rp": "receiver", "time": "11/31"},
-    {"id": "5", "d": "kk", "rp": "receiver", "time": "11/31"},
-    {"id": "6", "d": "kk", "rp": "receiver", "time": "11/31"},
-    {"id": "7", "d": "kk", "rp": "receiver", "time": "11/31"},
-    {"id": "8", "d": "kk", "rp": "receiver", "time": "11/31"},
-    {"id": "9", "d": "kk", "rp": "receiver", "time": "11/31"},
-    {"id": "10", "d": "kk", "rp": "receiver", "time": "11/31"},
-    {"id": "11", "d": "kk", "rp": "receiver", "time": "11/31"},
-  ];
+  late List MissedOrders = [];
+  late int userID = -1;
+  _Order_Get_List_State(int userID) {
+    this.userID = userID;
+  }
+
+  getMissed() async {
+    // CustomSnackBar(context, const Text('Login button pressed'));
+    int length = 0;
+    var baseUrl = "http://delivery.mcatk.com";
+    var uri = "/api/getAllOrders/";
+    var body = {};
+    http.Response response = await http.post(Uri.parse(baseUrl + uri), body: Convert.jsonEncode(body));
+    final statusCode = response.statusCode;
+    final responseBody = response.body;
+    var result = Convert.jsonDecode(responseBody);
+    print('${statusCode}');
+    print('[uri=$uri][statusCode=$statusCode][response=$responseBody]');
+    this.MissedOrders = result["orders"];
+    setState(() {
+      this.MissedOrders = result["orders"];
+    });
+  }
+
+  takeOrder(int userID, int orderID) async {
+    // CustomSnackBar(context, const Text('Login button pressed'));
+    int length = 0;
+    var baseUrl = "http://delivery.mcatk.com";
+    var uri = "/api/takeOrder/";
+
+    var body = {"userID": userID.toString(), "orderID": orderID.toString()};
+    http.Response response = await http.post(Uri.parse(baseUrl + uri), body: Convert.jsonEncode(body));
+    final statusCode = response.statusCode;
+    final responseBody = response.body;
+    var result = Convert.jsonDecode(responseBody);
+    print('${statusCode}');
+    print('[uri=$uri][statusCode=$statusCode][response=$responseBody]');
+  }
 
   @override
   Widget build(BuildContext context) {
+    getMissed();
     return ListView.builder(
         shrinkWrap: true,
         padding: const EdgeInsets.all(8),
-        itemCount: sends.length,
+        itemCount: MissedOrders.length,
         itemBuilder: (BuildContext context, int index) {
           return Container(
-            height: 150,
+            //height: 700,
             decoration: BoxDecoration(
               //border: new Border.all(color: Color(0xFF3E3737), width: 2),
                 color: const Color(0xFFFFFFFF),
@@ -68,7 +104,7 @@ class _Order_Get_List_State extends State<_Order_Get_List> {
                             children: [
                               Expanded(
                                 child: Text(
-                                  '订单号：${sends[index]["id"]}',
+                                  '订单号：${MissedOrders[index]["orderID"]}',
                                   style: const TextStyle(
                                       fontWeight: FontWeight.bold, fontSize: 15),
                                   textAlign: TextAlign.left,
@@ -76,7 +112,7 @@ class _Order_Get_List_State extends State<_Order_Get_List> {
                               ),
                               Expanded(
                                 child: Text(
-                                  '${sends[index]["time"]}',
+                                  '${MissedOrders[index]["orderDate"]}',
                                   style: const TextStyle(),
                                   textAlign: TextAlign.right,
                                 ),
@@ -98,14 +134,14 @@ class _Order_Get_List_State extends State<_Order_Get_List> {
                             children: [
                               Expanded(
                                 child: Text(
-                                  '收货人：${sends[index]["rp"]}',
+                                  '收货人：${MissedOrders[index]["orderUserNickName"]}',
                                   style: const TextStyle(fontSize: 15.0),
                                   textAlign: TextAlign.left,
                                 ),
                               ),
                               Expanded(
                                 child: Text(
-                                  '目的地：${sends[index]["d"]}',
+                                  '目的地：${MissedOrders[index]["orderUserAddress"]}',
                                   style: const TextStyle(fontSize: 15.0),
                                   textAlign: TextAlign.right,
                                 ),
@@ -114,6 +150,66 @@ class _Order_Get_List_State extends State<_Order_Get_List> {
                           ),
                         ))
                   ],
+                ),
+                Container(
+                  //height: 400.0,
+                  child: ListView.builder(
+                      shrinkWrap: true,
+                      itemCount: MissedOrders[index]["food"].length,
+                      itemBuilder: (BuildContext context, int fi) {
+                        return Container(
+                          child: Row(
+                            children: [
+
+                              Container(
+                                width: 100.0,
+                                alignment: Alignment.centerLeft,
+                                margin: EdgeInsets.only(left: 5.0, top: 20.0),
+                                child: Column(
+                                  children: [
+                                    Image.network('${MissedOrders[index]["food"][fi]["foodUrl"]}', height: 80.0,),
+                                  ],
+                                ),
+                              ),
+                              SizedBox(width: 10.0,),
+                              Expanded(
+                                  child: Column(
+                                    children: [
+                                      SizedBox(height: 20.0,),
+                                      Container(
+                                        child: Text(
+                                          '${MissedOrders[index]["food"][fi]["foodName"]}',
+                                          textAlign: TextAlign.left,
+                                        ),
+                                      ),
+                                      SizedBox(height: 30.0,),
+                                      Container(
+                                        child: Row(
+                                          children: [
+                                            Expanded(
+                                                child: Text(
+                                                  '单价：${MissedOrders[index]["food"][fi]["foodPrice"]}',
+                                                  textAlign: TextAlign.left,
+                                                )
+                                            ),
+                                            Expanded(
+                                                child:Text(
+                                                  '数量：${MissedOrders[index]["food"][fi]["foodNum"]}',
+                                                  textAlign: TextAlign.right,
+                                                )
+                                            )
+                                          ],
+                                        ),
+                                      )
+                                    ],
+                                  )
+                              ),
+
+                            ],
+                          ),
+                        );
+
+                      }),
                 ),
                 Row(
                   children: [
@@ -143,9 +239,8 @@ class _Order_Get_List_State extends State<_Order_Get_List> {
                               style: TextStyle(fontSize: 15.0),
                             ),
                             onPressed: () {
-                              setState(() {
-                                sends.removeAt(index);
-                              });
+                              takeOrder(this.userID, MissedOrders[index]["orderID"]);
+
                             },
                           ),
                         ))

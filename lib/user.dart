@@ -17,7 +17,7 @@ class _UserPage extends StatelessWidget {
       routes: {
         "/": (context) => Myself(this.userID),
         "/personalInfo": (context) => PersonalInfo(),
-        "/sendOrder": (context) => _Order_SendRoute(),
+        "/sendOrder": (context) => _Order_SendRoute(this.userID),
         "/receiveOrder": (context) => _Order_ReceiveRoute(this.userID),
         "/wallet": (context) => Wallet(),
       },
@@ -533,37 +533,66 @@ List<Item> generateItems(int numberOfItems) {
 
 class MyList extends StatefulWidget {
 
+  late int userID = -1;
+  MyList(int userID) {
+    this.userID = userID;
+  }
 
   @override
-  createState() => MyListState();
+  createState() => MyListState(this.userID);
 }
 
 class MyListState extends State<MyList> {
 
+  late int userID = -1;
+  late List sendOrders = [];
+  MyListState(int userID) {
+    this.userID = userID;
+  }
 
-  List<Map<String, String>> sends = [
-    {"id": "1", "d": "kk", "rp": "receiver", "time": "11/31"},
-    {"id": "2", "d": "kk", "rp": "receiver", "time": "11/31"},
-    {"id": "3", "d": "kk", "rp": "receiver", "time": "11/31"},
-    {"id": "4", "d": "kk", "rp": "receiver", "time": "11/31"},
-    {"id": "5", "d": "kk", "rp": "receiver", "time": "11/31"},
-    {"id": "6", "d": "kk", "rp": "receiver", "time": "11/31"},
-    {"id": "7", "d": "kk", "rp": "receiver", "time": "11/31"},
-    {"id": "8", "d": "kk", "rp": "receiver", "time": "11/31"},
-    {"id": "9", "d": "kk", "rp": "receiver", "time": "11/31"},
-    {"id": "10", "d": "kk", "rp": "receiver", "time": "11/31"},
-    {"id": "11", "d": "kk", "rp": "receiver", "time": "11/31"},
-  ];
+  // List<Map<String, String>> sendOrders = [
+  //   {"id": "1", "d": "kk", "rp": "receiver", "time": "11/31"},
+  //   {"id": "2", "d": "kk", "rp": "receiver", "time": "11/31"},
+  //   {"id": "3", "d": "kk", "rp": "receiver", "time": "11/31"},
+  //   {"id": "4", "d": "kk", "rp": "receiver", "time": "11/31"},
+  //   {"id": "5", "d": "kk", "rp": "receiver", "time": "11/31"},
+  //   {"id": "6", "d": "kk", "rp": "receiver", "time": "11/31"},
+  //   {"id": "7", "d": "kk", "rp": "receiver", "time": "11/31"},
+  //   {"id": "8", "d": "kk", "rp": "receiver", "time": "11/31"},
+  //   {"id": "9", "d": "kk", "rp": "receiver", "time": "11/31"},
+  //   {"id": "10", "d": "kk", "rp": "receiver", "time": "11/31"},
+  //   {"id": "11", "d": "kk", "rp": "receiver", "time": "11/31"},
+  // ];
+
+  getSend() async {
+    // CustomSnackBar(context, const Text('Login button pressed'));
+    int length = 0;
+    var baseUrl = "http://delivery.mcatk.com";
+    var uri = "/api/getInformation/";
+    var body = {"userID": this.userID.toString()};
+    http.Response response = await http.post(Uri.parse(baseUrl + uri), body: Convert.jsonEncode(body));
+    final statusCode = response.statusCode;
+    final responseBody = response.body;
+    var result = Convert.jsonDecode(responseBody);
+    //print('[uri=$uri][statusCode=$statusCode][response=$responseBody]');
+    this.sendOrders = result["userDeliveryOrders"];
+    setState(() {
+      this.sendOrders = result["userDeliveryOrders"];
+      this.sendOrders.removeWhere((element) => element["orderCompleted"] == 0 || element["orderCompleted"] == 2);
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
+
+    getSend();
     return ListView.builder(
         shrinkWrap: true,
         padding: const EdgeInsets.all(8),
-        itemCount: sends.length,
+        itemCount: sendOrders.length,
         itemBuilder: (BuildContext context, int index) {
           return Container(
-            height: 150,
+            //height: 150,
             decoration: BoxDecoration(
                 //border: new Border.all(color: Color(0xFF3E3737), width: 2),
                 color: const Color(0xFFFFFFFF),
@@ -580,7 +609,7 @@ class MyListState extends State<MyList> {
                         children: [
                           Expanded(
                             child: Text(
-                              '订单号：${sends[index]["id"]}',
+                              '订单号：${sendOrders[index]["orderID"]}',
                               style: const TextStyle(
                                   fontWeight: FontWeight.bold, fontSize: 15),
                               textAlign: TextAlign.left,
@@ -588,7 +617,7 @@ class MyListState extends State<MyList> {
                           ),
                           Expanded(
                             child: Text(
-                              '${sends[index]["time"]}',
+                              '${sendOrders[index]["orderDate"]}',
                               style: const TextStyle(),
                               textAlign: TextAlign.right,
                             ),
@@ -610,14 +639,14 @@ class MyListState extends State<MyList> {
                         children: [
                           Expanded(
                             child: Text(
-                              '收货人：${sends[index]["rp"]}',
+                              '收货人：${sendOrders[index]["orderUserNickName"]}',
                               style: const TextStyle(fontSize: 15.0),
                               textAlign: TextAlign.left,
                             ),
                           ),
                           Expanded(
                             child: Text(
-                              '目的地：${sends[index]["d"]}',
+                              '目的地：${sendOrders[index]["orderUserAddress"]}',
                               style: const TextStyle(fontSize: 15.0),
                               textAlign: TextAlign.right,
                             ),
@@ -626,6 +655,66 @@ class MyListState extends State<MyList> {
                       ),
                     ))
                   ],
+                ),
+                Container(
+                  //height: 400.0,
+                  child: ListView.builder(
+                      shrinkWrap: true,
+                      itemCount: sendOrders[index]["food"].length,
+                      itemBuilder: (BuildContext context, int fi) {
+                        return Container(
+                          child: Row(
+                            children: [
+
+                              Container(
+                                width: 100.0,
+                                alignment: Alignment.centerLeft,
+                                margin: EdgeInsets.only(left: 5.0, top: 20.0),
+                                child: Column(
+                                  children: [
+                                    Image.network('${sendOrders[index]["food"][fi]["foodUrl"]}', height: 80.0,),
+                                  ],
+                                ),
+                              ),
+                              SizedBox(width: 10.0,),
+                              Expanded(
+                                  child: Column(
+                                    children: [
+                                      SizedBox(height: 20.0,),
+                                      Container(
+                                        child: Text(
+                                          '${sendOrders[index]["food"][fi]["foodName"]}',
+                                          textAlign: TextAlign.left,
+                                        ),
+                                      ),
+                                      SizedBox(height: 30.0,),
+                                      Container(
+                                        child: Row(
+                                          children: [
+                                            Expanded(
+                                                child: Text(
+                                                  '单价：${sendOrders[index]["food"][fi]["foodPrice"]}',
+                                                  textAlign: TextAlign.left,
+                                                )
+                                            ),
+                                            Expanded(
+                                                child:Text(
+                                                  '数量：${sendOrders[index]["food"][fi]["foodNum"]}',
+                                                  textAlign: TextAlign.right,
+                                                )
+                                            )
+                                          ],
+                                        ),
+                                      )
+                                    ],
+                                  )
+                              ),
+
+                            ],
+                          ),
+                        );
+
+                      }),
                 ),
                 Row(
                   children: [
@@ -643,7 +732,7 @@ class MyListState extends State<MyList> {
                         ),
                         onPressed: () {
                           setState(() {
-                            sends.removeAt(index);
+                            sendOrders.removeAt(index);
                           });
                         },
                       ),
@@ -659,6 +748,10 @@ class MyListState extends State<MyList> {
 
 class _Order_SendRoute extends StatelessWidget {
 
+  late int userID = -1;
+  _Order_SendRoute(int userID) {
+    this.userID = userID;
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -670,7 +763,7 @@ class _Order_SendRoute extends StatelessWidget {
         shadowColor: Colors.yellow,
       ),
       backgroundColor: const Color.fromARGB(255, 239, 239, 239),
-      body: MyList(),
+      body: MyList(this.userID),
     );
   }
 }
@@ -821,12 +914,23 @@ class ExpansionListState extends State<ExpansionList> {
     final statusCode = response.statusCode;
     final responseBody = response.body;
     var result = Convert.jsonDecode(responseBody);
-    print('[uri=$uri][statusCode=$statusCode][response=$responseBody]');
+    //print('[uri=$uri][statusCode=$statusCode][response=$responseBody]');
     this.receiveOrders = result["userOrders"];
     setState(() {
       this.receiveOrders = result["userOrders"];
-      this.receiveOrders.removeWhere((element) => element["orderCompleted"] == 1);
+      this.receiveOrders.removeWhere((element) => element["orderCompleted"] == 2);
     });
+  }
+
+  finishOrder(int orderID) async {
+    var baseUrl = "http://delivery.mcatk.com";
+    var uri = "/api/finishOrder/";
+    var body = {"orderID": orderID.toString()};
+    http.Response response = await http.post(Uri.parse(baseUrl + uri), body: Convert.jsonEncode(body));
+    //final statusCode = response.statusCode;
+    //final responseBody = response.body;
+    //var result = Convert.jsonDecode(responseBody);
+    //print('[uri=$uri][statusCode=$statusCode][response=$responseBody]');
   }
 
   @override
@@ -948,24 +1052,24 @@ class ExpansionListState extends State<ExpansionList> {
               alignment: Alignment.centerLeft,
               margin: const EdgeInsets.only(top: 10.0),
               child: Text(
-                '骑手：${item["deliveryUserName"]}',
+                '骑手：${item["deliveryUserNickName"] == null ? '无' : item["deliveryUserNickName"]}',
               )),
           Container(
             alignment: Alignment.centerLeft,
             margin: const EdgeInsets.only(top: 10.0),
             child: Text(
-              '联系电话：${item["deliveryUserTel"]}',
+              '联系电话：${item["deliveryUserTel"] == null ? '无' : item["deliveryUserTel"]}',
             ),
           ),
           Container(
               alignment: Alignment.centerRight,
               margin: const EdgeInsets.only(right: 10.0),
               child: ElevatedButton(
-                onPressed: () {
-                  setState(() {
-                    receiveOrders.removeAt(receiveOrders.indexOf(item));
-                  });
+                onPressed: (item["deliveryUserNickName"] == null ? true : false) ? null : () {
+                  finishOrder(item["orderID"]);
+
                 },
+
                 child: const Text('已收到'),
               )),
         ],

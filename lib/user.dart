@@ -100,7 +100,8 @@ class _Home_RootState extends State<HomeRootList> {
               childAspectRatio: 1.0,
             ),
             itemBuilder: (context, index) {
-              return _SuggestedDishCard(data: dishInfo);
+              return _SuggestedDishCard(data: new DishInfo(this.stars[index]["foodUrl"],this.stars[$index]["foodName"]
+              ,this.stars[0]["foodPrice"],this.stars[0]["foodUrl"]));
             },
           ),
         ));

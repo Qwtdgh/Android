@@ -6,7 +6,7 @@ class _ShoppingCart extends StatelessWidget {
     var shoppingList = ModalRoute
         .of(context)!
         .settings
-        .arguments as List<DishInfo>;
+        .arguments;
     return Scaffold(
       appBar: AppBar(
         title: const Text('Shopping Cart'),
@@ -36,8 +36,8 @@ class _ShoppingCart extends StatelessWidget {
 }
 
 class _CartBody extends StatelessWidget {
-  final List<DishInfo> shoppingList;
-  const _CartBody(this.shoppingList);
+  late var shoppingList;
+  _CartBody(this.shoppingList);
 
   @override
   Widget build(BuildContext context) {
@@ -46,15 +46,15 @@ class _CartBody extends StatelessWidget {
 }
 
 class _GuessYouLikePage extends StatefulWidget {
-  final List<DishInfo> shoppingList;
-  const _GuessYouLikePage(this.shoppingList);
+  late var shoppingList;
+  _GuessYouLikePage(this.shoppingList);
 
   @override
   _GuessYouLikePageState createState() => _GuessYouLikePageState(shoppingList);
 }
 
 class _GuessYouLikePageState extends State<_GuessYouLikePage> {
-  late List<DishInfo> shoppingList;
+  late var shoppingList;
   _GuessYouLikePageState(this.shoppingList);
   @override
   Widget build(BuildContext context) {
@@ -68,8 +68,8 @@ class _GuessYouLikePageState extends State<_GuessYouLikePage> {
 }
 
 class _ShoppingCard extends StatelessWidget {
-  final DishInfo shoppingDish;
-  const _ShoppingCard(this.shoppingDish);
+  late var shoppingDish;
+  _ShoppingCard(this.shoppingDish);
 
   @override
   Widget build(BuildContext context) {
@@ -77,11 +77,11 @@ class _ShoppingCard extends StatelessWidget {
         children: [
           const SizedBox(height: 25.0),
           getFoodItem(
-            context,
-              shoppingDish.dishName,
-              shoppingDish.dishImgUrl,
-              shoppingDish.dishPrice,
-              shoppingDish.dishPlace,
+              context,
+              shoppingDish.name,
+              shoppingDish.url,
+              shoppingDish.price,
+              shoppingDish.place,
               5),
           const SizedBox(height: 25.0),
           Padding(

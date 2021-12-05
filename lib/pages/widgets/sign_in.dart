@@ -185,7 +185,7 @@ class _SignInState extends State<SignIn> {
                     final statusCode = response.statusCode;
                     final responseBody = response.body;
                     var result = Convert.jsonDecode(responseBody);
-                    print('[uri=$uri][statusCode=$statusCode][response=$responseBody]');
+                    //print('[uri=$uri][statusCode=$statusCode][response=$responseBody]');
 
                     //var http =  HttpRequest("http://delivery.mcatk.com");
 

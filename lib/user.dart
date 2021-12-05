@@ -331,16 +331,6 @@ class MyselfListState extends State<MyselfList> {
                   //小点点在右侧摆动的时间,这里为10秒
                   toAnimate: true, //允许摆动，false时showBadge会失效
                 ),
-                // Badge(
-                //   //文本内容Text为空时子组件为null时则返回一个红点，其他值时按实际显示
-                //   badgeContent:Text(""),
-                //   child: Text("待配送"), //子组件
-                //   badgeColor: Colors.red,  //右上角小红点颜色（默认时为红色）
-                //   showBadge: true,//true时刷新时会在右则摆动一下
-                //   animationDuration:Duration(seconds: 10),//小点点在右侧摆动的时间,这里为10秒
-                //   toAnimate:true, //允许摆动，false时showBadge会失效
-                //
-                // ),
               ],
             )),
       );
@@ -352,39 +342,6 @@ class MyselfListState extends State<MyselfList> {
       //padding: EdgeInsets.all(15),
       children: [
         _normalCard(),
-        // Row(
-        //   children: <Widget>[
-        //     // CircleAvatar(
-        //     //   // 宽高不一致为，裁剪后为椭圆形
-        //     //   child: Container(
-        //     //     height: 100,
-        //     //     width: 150,
-        //     //     child: Image.asset(
-        //     //       "images/login/login_logo.png",
-        //     //       fit: BoxFit.cover,
-        //     //     ),
-        //     //   ),
-        //     // ),
-        //
-        //     Container(
-        //         width: 100,
-        //         height: 100,
-        //         decoration: ShapeDecoration(
-        //             shape: RoundedRectangleBorder(
-        //                 borderRadius: BorderRadius.circular(16)),
-        //             image: DecorationImage(
-        //                 fit: BoxFit.cover,
-        //                 image: AssetImage("images/login/login_logo.png")))),
-        //     Text("用户昵称"),
-        //   ],
-        // ),
-
-        // Image(
-        //
-        //   fit: BoxFit.cover,
-        //   image: new AssetImage('images/login/login_logo.png'),
-        // ),
-        //Padding(padding: EdgeInsets.all(10)),
         _shapeCard(context, "个人信息", "/personalInfo"),
         _shapeCard0(context, "历史订单", "/sendOrder"),
         //_shapeCard(context,"钱包","/wallet")
@@ -410,7 +367,6 @@ class Myself extends StatelessWidget {
   Myself(int userID) {
     this.userID = userID;
   }
-
 
   @override
   Widget build(BuildContext context) {

@@ -1,14 +1,14 @@
 part of 'main.dart';
 
 class _CanteenInfo extends StatelessWidget {
-  late CanteenInfo data;
+  var store;
 
   @override
   Widget build(BuildContext context) {
-    data = ModalRoute.of(context)!.settings.arguments as CanteenInfo;
+    store = ModalRoute.of(context)!.settings.arguments;
     return Scaffold(
       appBar: AppBar(
-        title: Text(data.canteenName),
+        title: Text(store['storeName']),
         foregroundColor: Colors.black,
         backgroundColor: Colors.yellow,
         actions: <Widget>[
@@ -21,26 +21,16 @@ class _CanteenInfo extends StatelessWidget {
         ],
       ),
       body: Center(
-        child: _CanteenInfoPage(data: data),
+        child: _CanteenInfoPage(store),
       ),
-      /*floatingActionButton: FloatingActionButton(
-        onPressed: () {
-          Navigator.pushNamed(context, '/canteen/cart');
-        },
-        child: const Icon(Icons.shopping_cart),
-        backgroundColor: Colors.orangeAccent,
-      ),*/
     );
   }
 }
 
 class _CanteenInfoPage extends StatelessWidget {
-  final CanteenInfo data;
+  var store;
 
-  const _CanteenInfoPage({
-    Key? key,
-    required this.data,
-  }) : super(key: key);
+  _CanteenInfoPage(this.store);
 
   @override
   Widget build(BuildContext context) {
@@ -83,7 +73,7 @@ class _CanteenInfoPage extends StatelessWidget {
             child: ClipRRect(
               borderRadius: BorderRadius.circular(8),
               child: Image.network(
-                data.canteenImgUrl,
+                store['storeUrl'],
                 height: 150,
                 fit: BoxFit.cover,
               ),
@@ -104,15 +94,15 @@ class _CanteenInfoPage extends StatelessWidget {
               // verticalDirection: Ver,
               children: [
                 Text(
-                  '食堂名称：\t' + data.canteenName,
+                  '食堂名称：\t' + store['storeName'],
                   style: textStyle,
                 ),
                 Text(
-                  '食堂地址：\t' + data.canteenAddr,
+                  '食堂地址：\t' + store['storeAddress'],
                   style: textStyle,
                 ),
                 Text(
-                  '食堂电话：\t' + data.canteenTel,
+                  '食堂电话：\t' + store['storeTel'],
                   style: textStyle,
                 ),
               ],
@@ -131,7 +121,7 @@ class _CanteenInfoPage extends StatelessWidget {
         child: Stack(
           fit: StackFit.passthrough,
           children: <Widget>[
-            _MenuRoot(),
+            _MenuRoot(store['food']),
             Positioned(
               left: 0,
               right: 0,
@@ -163,41 +153,14 @@ class _CanteenInfoPage extends StatelessWidget {
 }
 
 class _MenuRoot extends StatelessWidget {
-  _MenuRoot({Key? key}) : super(key: key);
-  DishInfo dishInfo = const DishInfo(
-    dishImgUrl:
-        'https://gimg2.baidu.com/image_search/src=http%3A%2F%2Fimgsa.baidu.com%2Fexp%2Fw%3D500%2Fsign%3D449be3d66381800a6ee5890e813433d6%2F8694a4c27d1ed21b9b3734bca26eddc450da3fe8.jpg&refer=http%3A%2F%2Fimgsa.baidu.com&app=2002&size=f9999,10000&q=a80&n=0&g=0n&fmt=jpeg?sec=1640937777&t=f86139b4672f345a1a881cc08deb4aeb',
-    dishName: '宫保鸡丁',
-    dishPlace: '合一食堂',
-    dishPrice: 30000,
-    comments: [
-      'Great',
-      'Garbage',
-      'Huge',
-      'Huge',
-      'Huge',
-      'Huge',
-      'Huge',
-      'Huge',
-      'Huge',
-      'Huge',
-      'Huge',
-      'Huge',
-      'Huge',
-      'Huge',
-      'Huge',
-      'Huge',
-      'Huge',
-      'Huge',
-      'Huge',
-      'Huge'
-    ],
-  );
+  late var foodList;
+  _MenuRoot(this.foodList);
 
   @override
   Widget build(BuildContext context) {
     return Center(
       child: GridView.builder(
+        itemCount: foodList.length,
         gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
           crossAxisCount: 2,
           mainAxisSpacing: 1.0,
@@ -205,7 +168,7 @@ class _MenuRoot extends StatelessWidget {
           childAspectRatio: 1.5,
         ),
         itemBuilder: (context, index) {
-          return _MenuSuggestedDishCard(data: dishInfo);
+          return _MenuSuggestedDishCard(foodList[index]);
         },
       ),
     );
@@ -213,18 +176,15 @@ class _MenuRoot extends StatelessWidget {
 }
 
 class _MenuSuggestedDishCard extends StatelessWidget {
-  final DishInfo data;
+  late var food;
 
-  const _MenuSuggestedDishCard({
-    Key? key,
-    required this.data,
-  }) : super(key: key);
+  _MenuSuggestedDishCard(this.food);
 
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
       onTap: () {
-        Navigator.pushNamed(context, '/canteen/dishdisplay', arguments: data);
+        Navigator.pushNamed(context, '/canteen/dishdisplay', arguments: food);
       },
       child: Container(
         margin: const EdgeInsets.fromLTRB(1, 1, 1, 1),
@@ -240,7 +200,7 @@ class _MenuSuggestedDishCard extends StatelessWidget {
         fit: StackFit.passthrough,
         children: <Widget>[
           Image.network(
-            data.dishImgUrl,
+            food['foodUrl'],
             height: 100,
             fit: BoxFit.cover,
           ),
@@ -260,7 +220,7 @@ class _MenuSuggestedDishCard extends StatelessWidget {
                 ),
               ),
               child: Text(
-                data.dishName,
+                food['foodName'],
                 maxLines: 2,
                 overflow: TextOverflow.ellipsis,
                 style: const TextStyle(

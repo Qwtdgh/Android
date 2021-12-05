@@ -13,7 +13,7 @@ class _CanteenPage extends StatelessWidget {
         '/canteen': (context) => _CanteenRoot(),
         '/canteen/canteendisplay': (context, {arguments}) => _CanteenInfo(),
         '/canteen/dishdisplay': (context, {arguments}) => _DishInfo(),
-        '/cart': (context) => _Shopping_Cart(),
+        '/cart': (context) => _ShoppingCart(),
         // '/receive': (context) => const _Order_ReceiveRoute(),
       },
     );

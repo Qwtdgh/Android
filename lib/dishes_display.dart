@@ -34,7 +34,7 @@ class _HomeRootState extends State<_HomeRoot> {
   late var userID;
   _HomeRootState(this.userID);
   getAll(BuildContext context) async {
-    var baseUrl = "http://delivery.mcatk.com";
+    var baseUrl = "http://42.192.60.125";
     var uri = "/api/getTopFoodList/";
     var body = {};
     http.Response response = await http.post(Uri.parse(baseUrl + uri), body: Convert.jsonEncode(body));
@@ -204,7 +204,7 @@ class _SuggestedDishCard extends StatelessWidget {
   }
 
   setAll(BuildContext context) async {
-    var baseUrl = "http://delivery.mcatk.com";
+    var baseUrl = "http://42.192.60.125";
     var uri = "/api/setStar/";
     var body = {
       'userID': userID,

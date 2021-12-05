@@ -29,7 +29,7 @@ class _CanteenRootState extends State<_CanteenRoot> {
   var stores = [];
 
   getAll(BuildContext context) async {
-    var baseUrl = "http://delivery.mcatk.com";
+    var baseUrl = "http://42.192.60.125";
     var uri = "/api/getStores/";
     var body = {};
     http.Response response = await http.post(Uri.parse(baseUrl + uri), body: Convert.jsonEncode(body));

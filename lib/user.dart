@@ -20,8 +20,123 @@ class _UserPage extends StatelessWidget {
         "/sendOrder": (context, {arguments}) => _Order_SendRoute(),
         "/receiveOrder": (context, {arguments}) => _Order_ReceiveRoute(),
         "/likes": (context) => _Home_Root1(this.userID),
+        "/changePassword": (context) => TextFieldAndCheckPage(this.userID),
+        "/login": (context) => LoginPage(),
+        "/main" : (context,{arguments}) => Main_Page(),
       },
     );
+  }
+}
+
+class TextFieldAndCheckPage extends StatefulWidget {
+  late int userID = -1;
+  @override
+  TextFieldAndCheckPage(int userID): this.userID = userID;
+  State<StatefulWidget> createState() => TextFieldAndCheckPageState(userID);
+}
+
+class TextFieldAndCheckPageState extends State<TextFieldAndCheckPage> {
+  late int userID = -1;
+  late String oldPassword = "";
+  late String newPassword = "";
+  //手机号的控制器
+  TextFieldAndCheckPageState(int userID): this.userID = userID;
+  TextEditingController oldpassController = TextEditingController();
+
+  //密码的控制器
+  TextEditingController passController = TextEditingController();
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: Text('输入和选择'),
+      ),
+      body: Column(
+        children: <Widget>[
+          TextField(
+            controller: oldpassController,
+            keyboardType: TextInputType.number,
+            decoration: InputDecoration(
+              contentPadding: EdgeInsets.all(10.0),
+              icon: Icon(Icons.lock),
+              labelText: '请输入您的旧密码)',
+              // helperText: '请输入您的新密码',
+            ),
+            autofocus: false,
+          ),
+          TextField(
+              controller: passController,
+              keyboardType: TextInputType.number,
+              decoration: InputDecoration(
+                contentPadding: EdgeInsets.all(10.0),
+                icon: Icon(Icons.lock),
+                labelText: '请输入您的新密码)',
+              ),
+              obscureText: true),
+          RaisedButton(
+            onPressed: () async {
+              // CustomSnackBar(context, const Text('Login button pressed'));
+
+              var baseUrl = "http://42.192.60.125";
+              var uri = "/api/changePassword/";
+              var body = {"userID": this.userID.toString(),
+                          "userOldPassword": oldpassController.text,
+                          "userPassword": passController.text};
+              http.Response response = await http.post(
+                  Uri.parse(baseUrl + uri), body: Convert.jsonEncode(body));
+              final statusCode = response.statusCode;
+              final responseBody = response.body;
+              var result = Convert.jsonDecode(responseBody);
+              print('[uri=$uri][statusCode=$statusCode][response=$responseBody]');
+
+              //var http =  HttpRequest("http://delivery.mcatk.com");
+
+              //Map<String, String> ret = http.post("/api/login/", body) as Map<String, String>;
+              //String? userID = ret["userID"];
+              var userID = result["userID"];
+              print(userID);
+              Navigator.pushNamed(context,"/login");
+              },
+            child: Text('重新登陆你丫的'),
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _login() {
+    print({'phone': oldpassController.text, 'password': passController.text});
+    if (oldpassController.text.length != 11) {
+      showDialog(
+          context: context,
+          builder: (context) =>
+              AlertDialog(
+                title: Text('手机号码格式不对'),
+              ));
+    } else if (passController.text.length == 0) {
+      showDialog(
+          context: context,
+          builder: (context) =>
+              AlertDialog(
+                title: Text('请填写密码'),
+              ));
+    } else {
+      showDialog(
+          context: context,
+          builder: (context) =>
+              AlertDialog(
+                title: Text('登录成功'),
+              ));
+      oldpassController.clear();
+    }
+  }
+
+  void onTextClear() {
+    setState(() {
+      oldpassController.clear();
+      passController.clear();
+    });
   }
 }
 
@@ -42,6 +157,7 @@ class _Home_RootState extends State<HomeRootList> {
   //_Home_Root({Key? key}) : super(key: key);
   late int userID = -1;
   List stars = [];
+
   _Home_RootState(int userID) {
     this.userID = userID;
   }
@@ -50,10 +166,11 @@ class _Home_RootState extends State<HomeRootList> {
   getAll(BuildContext context) async {
     // CustomSnackBar(context, const Text('Login button pressed'));
 
-    var baseUrl = "http://delivery.mcatk.com";
+    var baseUrl = "http://42.192.60.125";
     var uri = "/api/get_stars/";
     var body = {"userID": this.userID.toString()};
-    http.Response response = await http.post(Uri.parse(baseUrl + uri), body: Convert.jsonEncode(body));
+    http.Response response = await http.post(
+        Uri.parse(baseUrl + uri), body: Convert.jsonEncode(body));
     final statusCode = response.statusCode;
     final responseBody = response.body;
     var result = Convert.jsonDecode(responseBody);
@@ -67,7 +184,6 @@ class _Home_RootState extends State<HomeRootList> {
     print(userID);
     setState(() {
       this.stars = result;
-
     });
     // Navigator.pushNamed(context, "/main", arguments: userID);
   }
@@ -86,11 +202,11 @@ class _Home_RootState extends State<HomeRootList> {
   Widget build(BuildContext context) {
     getAll(context);
     return Scaffold(
-        // appBar: AppBar(
-        //   title: const Text('Home'),
-        //   foregroundColor: Colors.black,
-        //   backgroundColor: Colors.yellow,
-        // ),
+      // appBar: AppBar(
+      //   title: const Text('Home'),
+      //   foregroundColor: Colors.black,
+      //   backgroundColor: Colors.yellow,
+      // ),
         body: Center(
           child: GridView.builder(
             gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
@@ -136,6 +252,7 @@ class MyselfListState extends State<MyselfList> {
   late List sendOrders = [];
   late List receiveOrders = [];
   late List likes = [];
+  late String iconUrl = "";
 
   MyselfListState(int userID) {
     this.userID = userID;
@@ -147,7 +264,8 @@ class MyselfListState extends State<MyselfList> {
     var baseUrl = "http://42.192.60.125";
     var uri = "/api/getInformation/";
     var body = {"userID": this.userID.toString()};
-    http.Response response = await http.post(Uri.parse(baseUrl + uri), body: Convert.jsonEncode(body));
+    http.Response response = await http.post(
+        Uri.parse(baseUrl + uri), body: Convert.jsonEncode(body));
     final statusCode = response.statusCode;
     final responseBody = response.body;
     var result = Convert.jsonDecode(responseBody);
@@ -166,13 +284,13 @@ class MyselfListState extends State<MyselfList> {
       this.receiveOrders = result["userOrders"];
       this.sendOrders = result["userDeliveryOrders"];
       this.likes = result["userStars"];
+      this.iconUrl = result["userIconUrl"];
     });
     // Navigator.pushNamed(context, "/main", arguments: userID);
   }
 
   @override
   Widget build(BuildContext context) {
-
     getAll(context);
 
     Card _normalCard() {
@@ -209,7 +327,7 @@ class MyselfListState extends State<MyselfList> {
                   Container(
                       width: 100,
                       height: 100,
-                      child: Image.asset("images/login/login_logo.png")),
+                      child: Image.asset(this.iconUrl)),
                   Text('${this.userNickname}'),
                 ])),
       );
@@ -278,10 +396,10 @@ class MyselfListState extends State<MyselfList> {
                         //修改信息部分
                         //需要调用修改信息的函数
 
-                        Navigator.pushNamed(context, route);
+                        Navigator.pushNamed(context, "/changePassword");
                       },
                       icon: Icon(
-                        Icons.star,
+                        Icons.lock,
                         size: 32.0,
                       ),
                     ),
@@ -293,14 +411,16 @@ class MyselfListState extends State<MyselfList> {
     }
 
     Card _shapeCard0(BuildContext context, String str, String route) {
-      bool flag0 = true,flag1 = true,flag2=true;
-      if (this.sendOrders.isEmpty){
+      bool flag0 = true,
+          flag1 = true,
+          flag2 = true;
+      if (this.sendOrders.isEmpty) {
         flag0 = false;
       }
-      if (this.receiveOrders.isEmpty){
+      if (this.receiveOrders.isEmpty) {
         flag1 = false;
       }
-      if (this.likes.isEmpty){
+      if (this.likes.isEmpty) {
         flag2 = false;
       }
 
@@ -338,7 +458,8 @@ class MyselfListState extends State<MyselfList> {
                         children: <Widget>[
                           IconButton(
                             onPressed: () {
-                              Navigator.pushNamed(context, "/sendOrder", arguments: 1);
+                              Navigator.pushNamed(context, "/sendOrder",
+                                  arguments: 1);
                             },
                             icon: Icon(
                               Icons.local_grocery_store_outlined,
@@ -472,7 +593,7 @@ class MyselfList extends StatefulWidget {
 
   MyselfList(int userID) {
     this.userID = userID;
-}
+  }
 
   @override
   createState() => MyselfListState(this.userID);
@@ -650,7 +771,7 @@ class MyListState extends State<MyList> {
           return Container(
             height: 150,
             decoration: BoxDecoration(
-                //border: new Border.all(color: Color(0xFF3E3737), width: 2),
+              //border: new Border.all(color: Color(0xFF3E3737), width: 2),
                 color: const Color(0xFFFFFFFF),
                 borderRadius: BorderRadius.circular((10.0))),
             margin: const EdgeInsets.only(left: 0.0, right: 0.0, top: 5.0),
@@ -660,27 +781,28 @@ class MyListState extends State<MyList> {
                   children: [
                     Expanded(
                         child: Container(
-                      margin: const EdgeInsets.only(top: 10.0),
-                      child: Row(
-                        children: [
-                          Expanded(
-                            child: Text(
-                              '订单号：${sends[index]["id"]}',
-                              style: const TextStyle(
-                                  fontWeight: FontWeight.bold, fontSize: 15),
-                              textAlign: TextAlign.left,
-                            ),
+                          margin: const EdgeInsets.only(top: 10.0),
+                          child: Row(
+                            children: [
+                              Expanded(
+                                child: Text(
+                                  '订单号：${sends[index]["id"]}',
+                                  style: const TextStyle(
+                                      fontWeight: FontWeight.bold,
+                                      fontSize: 15),
+                                  textAlign: TextAlign.left,
+                                ),
+                              ),
+                              Expanded(
+                                child: Text(
+                                  '${sends[index]["time"]}',
+                                  style: const TextStyle(),
+                                  textAlign: TextAlign.right,
+                                ),
+                              )
+                            ],
                           ),
-                          Expanded(
-                            child: Text(
-                              '${sends[index]["time"]}',
-                              style: const TextStyle(),
-                              textAlign: TextAlign.right,
-                            ),
-                          )
-                        ],
-                      ),
-                    ))
+                        ))
                   ],
                 ),
                 const Divider(
@@ -690,49 +812,49 @@ class MyListState extends State<MyList> {
                   children: [
                     Expanded(
                         child: Container(
-                      margin: const EdgeInsets.only(top: 10.0),
-                      child: Row(
-                        children: [
-                          Expanded(
-                            child: Text(
-                              '收货人：${sends[index]["rp"]}',
-                              style: const TextStyle(fontSize: 15.0),
-                              textAlign: TextAlign.left,
-                            ),
+                          margin: const EdgeInsets.only(top: 10.0),
+                          child: Row(
+                            children: [
+                              Expanded(
+                                child: Text(
+                                  '收货人：${sends[index]["rp"]}',
+                                  style: const TextStyle(fontSize: 15.0),
+                                  textAlign: TextAlign.left,
+                                ),
+                              ),
+                              Expanded(
+                                child: Text(
+                                  '目的地：${sends[index]["d"]}',
+                                  style: const TextStyle(fontSize: 15.0),
+                                  textAlign: TextAlign.right,
+                                ),
+                              )
+                            ],
                           ),
-                          Expanded(
-                            child: Text(
-                              '目的地：${sends[index]["d"]}',
-                              style: const TextStyle(fontSize: 15.0),
-                              textAlign: TextAlign.right,
-                            ),
-                          )
-                        ],
-                      ),
-                    ))
+                        ))
                   ],
                 ),
                 Row(
                   children: [
                     Expanded(
                         child: Container(
-                      alignment: Alignment.centerRight,
-                      margin: const EdgeInsets.only(right: 10.0, top: 20.0),
-                      child: ElevatedButton(
-                        style: ElevatedButton.styleFrom(
-                            shadowColor: Colors.red,
-                            fixedSize: const Size.fromHeight(10)),
-                        child: const Text(
-                          '已送达',
-                          style: TextStyle(fontSize: 15.0),
-                        ),
-                        onPressed: () {
-                          setState(() {
-                            sends.removeAt(index);
-                          });
-                        },
-                      ),
-                    ))
+                          alignment: Alignment.centerRight,
+                          margin: const EdgeInsets.only(right: 10.0, top: 20.0),
+                          child: ElevatedButton(
+                            style: ElevatedButton.styleFrom(
+                                shadowColor: Colors.red,
+                                fixedSize: const Size.fromHeight(10)),
+                            child: const Text(
+                              '已送达',
+                              style: TextStyle(fontSize: 15.0),
+                            ),
+                            onPressed: () {
+                              setState(() {
+                                sends.removeAt(index);
+                              });
+                            },
+                          ),
+                        ))
                   ],
                 ),
               ],
@@ -764,11 +886,11 @@ class ExpansionList extends StatefulWidget {
 
 
   late List receiveOrders = [];
-  
+
   ExpansionList(List receiveOrders) {
-    this.receiveOrders = receiveOrders;  
+    this.receiveOrders = receiveOrders;
   }
-  
+
   @override
   State createState() {
     return ExpansionListState(this.receiveOrders);
@@ -777,13 +899,11 @@ class ExpansionList extends StatefulWidget {
 
 class ExpansionListState extends State<ExpansionList> {
 
-  
+
   late List receiveOrders = [];
-  
+
   ExpansionListState(List receiveOrders) {
     this.receiveOrders = receiveOrders;
-
-
   }
 
   // final List<Map<String, String>> receiveOrders = [
@@ -892,7 +1012,6 @@ class ExpansionListState extends State<ExpansionList> {
 
   @override
   Widget build(BuildContext context) {
-
     Widget _header(item) {
       return SizedBox(
         height: 20.0,
@@ -900,23 +1019,23 @@ class ExpansionListState extends State<ExpansionList> {
           children: [
             Expanded(
                 child: Row(
-              children: [
-                Expanded(
-                  child: Text(
-                    '${item["foodname"]}',
-                    textAlign: TextAlign.left,
-                    style: const TextStyle(fontSize: 16.0),
-                  ),
-                ),
-                Expanded(
-                  child: Text(
-                    '${item["time"]}',
-                    textAlign: TextAlign.right,
-                    style: const TextStyle(fontSize: 16.0),
-                  ),
-                )
-              ],
-            ))
+                  children: [
+                    Expanded(
+                      child: Text(
+                        '${item["foodname"]}',
+                        textAlign: TextAlign.left,
+                        style: const TextStyle(fontSize: 16.0),
+                      ),
+                    ),
+                    Expanded(
+                      child: Text(
+                        '${item["time"]}',
+                        textAlign: TextAlign.right,
+                        style: const TextStyle(fontSize: 16.0),
+                      ),
+                    )
+                  ],
+                ))
           ],
         ),
       );
@@ -1000,7 +1119,7 @@ class ExpansionListState extends State<ExpansionList> {
           child: Container(
               margin: const EdgeInsets.only(left: 10.0, right: 10.0, top: 10.0),
               decoration: BoxDecoration(
-                  //border: new Border.all(color: Color(0xFF3E3737), width: 2),
+                //border: new Border.all(color: Color(0xFF3E3737), width: 2),
                   color: const Color(0xFFFFFFFF),
                   borderRadius: BorderRadius.circular((30.0))),
               child: Column(
@@ -1018,10 +1137,12 @@ class _Order_ReceiveRoute extends StatelessWidget {
   late List receiveOrders = [];
 
 
-
   @override
   Widget build(BuildContext context) {
-    receiveOrders = ModalRoute.of(context)!.settings.arguments as List;
+    receiveOrders = ModalRoute
+        .of(context)!
+        .settings
+        .arguments as List;
     return Scaffold(
       appBar: AppBar(
         title: const Text("收餐"),

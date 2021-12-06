@@ -279,8 +279,11 @@ class MyselfListState extends State<MyselfList> {
       this.userNickname = result["userNickName"];
       this.userAddress = result["userAddress"];
       this.userTel = result["userTel"];
-      this.receiveOrders = result["userOrders"];
-      this.sendOrders = result["userDeliveryOrders"];
+      this.receiveOrders.removeWhere((element) => element["orderCompleted"] == 2);
+
+      this.sendOrders.removeWhere((element) => element["orderCompleted"] == 0 || element["orderCompleted"] == 2);
+
+      // this.sendOrders = result["userDeliveryOrders"];
       this.likes = result["userStars"];
       this.iconUrl = result["userIconUrl"];
     });

@@ -185,7 +185,7 @@ class _SignInState extends State<SignIn> {
                     final statusCode = response.statusCode;
                     final responseBody = response.body;
                     var result = Convert.jsonDecode(responseBody);
-                    print('[uri=$uri][statusCode=$statusCode][response=$responseBody]');
+                    //print('[uri=$uri][statusCode=$statusCode][response=$responseBody]');
 
                     //var http =  HttpRequest("http://delivery.mcatk.com");
 
@@ -193,7 +193,31 @@ class _SignInState extends State<SignIn> {
                     //String? userID = ret["userID"];
                     var userID = result["userID"];
                     print(userID);
+                    bool str = result["success"];
+                    while (str!=true){
+                      CustomSnackBar(
+                          context, const Text('滚你丫的，密码特么不对'));
+                      var baseUrl = "http://42.192.60.125";
+                      var uri = "/api/login/";
+                      var body = {"userName": loginNameController.text, "userPassword": loginPasswordController.text};
+                      http.Response response = await http.post(Uri.parse(baseUrl + uri), body: Convert.jsonEncode(body));
+                      final statusCode = response.statusCode;
+                      final responseBody = response.body;
+                      var result = Convert.jsonDecode(responseBody);
+                      print('[uri=$uri][statusCode=$statusCode][response=$responseBody]');
+
+                      //var http =  HttpRequest("http://delivery.mcatk.com");
+
+                      //Map<String, String> ret = http.post("/api/login/", body) as Map<String, String>;
+                      //String? userID = ret["userID"];
+                      var userID = result["userID"];
+                      str = result["success"];
+
+                    }
+
                     Navigator.pushNamed(context, "/main", arguments: userID);
+
+
                   },
                 ),
               )
@@ -260,47 +284,47 @@ class _SignInState extends State<SignIn> {
               ],
             ),
           ),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: <Widget>[
-              Padding(
-                padding: const EdgeInsets.only(top: 10.0, right: 40.0),
-                child: GestureDetector(
-                  onTap: () => CustomSnackBar(
-                      context, const Text('Facebook button pressed')),
-                  child: Container(
-                    padding: const EdgeInsets.all(15.0),
-                    decoration: const BoxDecoration(
-                      shape: BoxShape.circle,
-                      color: Colors.white,
-                    ),
-                    child: const Icon(
-                      FontAwesomeIcons.facebookF,
-                      color: Color(0xFF0084ff),
-                    ),
-                  ),
-                ),
-              ),
-              Padding(
-                padding: const EdgeInsets.only(top: 10.0),
-                child: GestureDetector(
-                  onTap: () => CustomSnackBar(
-                      context, const Text('Google button pressed')),
-                  child: Container(
-                    padding: const EdgeInsets.all(15.0),
-                    decoration: const BoxDecoration(
-                      shape: BoxShape.circle,
-                      color: Colors.white,
-                    ),
-                    child: const Icon(
-                      FontAwesomeIcons.google,
-                      color: Color(0xFF0084ff),
-                    ),
-                  ),
-                ),
-              ),
-            ],
-          ),
+          // Row(
+          //   mainAxisAlignment: MainAxisAlignment.center,
+          //   children: <Widget>[
+          //     Padding(
+          //       padding: const EdgeInsets.only(top: 10.0, right: 40.0),
+          //       child: GestureDetector(
+          //         onTap: () => CustomSnackBar(
+          //             context, const Text('Facebook button pressed')),
+          //         child: Container(
+          //           padding: const EdgeInsets.all(15.0),
+          //           decoration: const BoxDecoration(
+          //             shape: BoxShape.circle,
+          //             color: Colors.white,
+          //           ),
+          //           child: const Icon(
+          //             FontAwesomeIcons.facebookF,
+          //             color: Color(0xFF0084ff),
+          //           ),
+          //         ),
+          //       ),
+          //     ),
+          //     Padding(
+          //       padding: const EdgeInsets.only(top: 10.0),
+          //       child: GestureDetector(
+          //         onTap: () => CustomSnackBar(
+          //             context, const Text('Google button pressed')),
+          //         child: Container(
+          //           padding: const EdgeInsets.all(15.0),
+          //           decoration: const BoxDecoration(
+          //             shape: BoxShape.circle,
+          //             color: Colors.white,
+          //           ),
+          //           child: const Icon(
+          //             FontAwesomeIcons.google,
+          //             color: Color(0xFF0084ff),
+          //           ),
+          //         ),
+          //       ),
+          //     ),
+          //   ],
+          // ),
         ],
       ),
     );

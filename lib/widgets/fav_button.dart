@@ -47,7 +47,7 @@ class _FavButtonState extends State<FavButton> {
   }
 
   setFav(BuildContext context) async {
-    var baseUrl = "http://47.110.160.49";
+    var baseUrl = "http://42.192.60.125";
     var uri = "/api/setStar/";
     var body = {
       'userID': _Global.userID,
@@ -60,7 +60,7 @@ class _FavButtonState extends State<FavButton> {
   }
 
   unsetFav(BuildContext context) async {
-    var baseUrl = "http://47.110.160.49";
+    var baseUrl = "http://42.192.60.125";
     var uri = "/api/unStar/";
     var body = {
       'userID': _Global.userID,
@@ -73,7 +73,7 @@ class _FavButtonState extends State<FavButton> {
   }
 
   getIsFavorite(BuildContext context) async {
-    var baseUrl = "http://47.110.160.49";
+    var baseUrl = "http://42.192.60.125";
     var uri = "/api/getEvaluateFood/";
     var body = {
       'userID': _Global.userID,

@@ -1,11 +1,26 @@
-part of 'main.dart';
+import 'package:flutter/cupertino.dart';
+import 'package:flutter/material.dart';
 
-class _CanteenInfo extends StatelessWidget {
+import 'package:delivery/cart.dart';
+import 'package:delivery/dish_display.dart';
+
+class PassDataStore {
+  final dynamic store;
+  final int userID;
+
+  PassDataStore(this.store, this.userID);
+}
+
+class CanteenInfo extends StatelessWidget {
+  late var userID;
   late var store;
+  late var shoppingList = [];
 
   @override
   Widget build(BuildContext context) {
-    store = ModalRoute.of(context)!.settings.arguments;
+    PassDataStore tmp = ModalRoute.of(context)!.settings.arguments as PassDataStore;
+    store = tmp.store;
+    userID = tmp.userID;
     return Scaffold(
       appBar: AppBar(
         title: Text(store['storeName']),
@@ -21,16 +36,18 @@ class _CanteenInfo extends StatelessWidget {
         ],
       ),
       body: Center(
-        child: _CanteenInfoPage(store),
+        child: _CanteenInfoPage(store, userID, shoppingList),
       ),
     );
   }
 }
 
 class _CanteenInfoPage extends StatelessWidget {
-  var store;
+  late var store;
+  late var userID;
+  late var shoppingList = [];
 
-  _CanteenInfoPage(this.store);
+  _CanteenInfoPage(this.store, this.userID, this.shoppingList);
 
   @override
   Widget build(BuildContext context) {
@@ -121,7 +138,7 @@ class _CanteenInfoPage extends StatelessWidget {
         child: Stack(
           fit: StackFit.passthrough,
           children: <Widget>[
-            _MenuRoot(store['food']),
+            _MenuRoot(store['food'], userID, shoppingList),
             Positioned(
               left: 0,
               right: 0,
@@ -139,7 +156,7 @@ class _CanteenInfoPage extends StatelessWidget {
                 ),
                 child: ElevatedButton(
                   onPressed: () {
-                    Navigator.pushNamed(context, '/cart');
+                    Navigator.pushNamed(context, '/cart', arguments: PassDataCart(shoppingList, userID));
                   },
                   child: const Icon(Icons.shopping_cart),
                 ),
@@ -153,8 +170,10 @@ class _CanteenInfoPage extends StatelessWidget {
 }
 
 class _MenuRoot extends StatelessWidget {
+  late var userID;
   late var foodList;
-  _MenuRoot(this.foodList);
+  late var shoppingList;
+  _MenuRoot(this.foodList, this.userID, this.shoppingList);
 
   @override
   Widget build(BuildContext context) {
@@ -168,7 +187,7 @@ class _MenuRoot extends StatelessWidget {
           childAspectRatio: 1.5,
         ),
         itemBuilder: (context, index) {
-          return _MenuSuggestedDishCard(foodList[index]);
+          return _MenuSuggestedDishCard(foodList[index], userID, shoppingList);
         },
       ),
     );
@@ -177,14 +196,16 @@ class _MenuRoot extends StatelessWidget {
 
 class _MenuSuggestedDishCard extends StatelessWidget {
   late var food;
+  late var userID;
+  late var shoppingList;
 
-  _MenuSuggestedDishCard(this.food);
+  _MenuSuggestedDishCard(this.food, this.userID, this.shoppingList);
 
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
       onTap: () {
-        Navigator.pushNamed(context, '/canteen/dishdisplay', arguments: food);
+        Navigator.pushNamed(context, '/canteen/dishdisplay', arguments: PassDataDish(food, userID, shoppingList));
       },
       child: Container(
         margin: const EdgeInsets.fromLTRB(1, 1, 1, 1),

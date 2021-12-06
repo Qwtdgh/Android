@@ -1,6 +1,15 @@
-part of 'main.dart';
+import 'dart:convert' as convert;
+import 'package:http/http.dart' as http;
+import 'package:flutter/cupertino.dart';
+import 'package:flutter/material.dart';
 
-class _CanteenPage extends StatelessWidget {
+import 'package:delivery/canteen_display.dart';
+import 'package:delivery/dish_display.dart';
+import 'package:delivery/cart.dart';
+
+class CanteenPage extends StatelessWidget {
+  late var userID;
+  CanteenPage(this.userID);
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
@@ -10,10 +19,10 @@ class _CanteenPage extends StatelessWidget {
       ),
       initialRoute: '/canteen',
       routes: {
-        '/canteen': (context) => _CanteenRoot(),
-        '/canteen/canteendisplay': (context, {arguments}) => _CanteenInfo(),
-        '/canteen/dishdisplay': (context, {arguments}) => _DishInfo(),
-        '/cart': (context) => _ShoppingCart(),
+        '/canteen': (context) => _CanteenRoot(userID),
+        '/canteen/canteendisplay': (context, {arguments}) => CanteenInfo(),
+        '/canteen/dishdisplay': (context, {arguments}) => DishInfo(),
+        '/cart': (context, {arguments}) => ShoppingCart(),
         // '/receive': (context) => const _Order_ReceiveRoute(),
       },
     );
@@ -21,21 +30,26 @@ class _CanteenPage extends StatelessWidget {
 }
 
 class _CanteenRoot extends StatefulWidget {
+  late var userID;
+  _CanteenRoot(this.userID);
   @override
-  _CanteenRootState createState() => _CanteenRootState();
+  _CanteenRootState createState() => _CanteenRootState(userID);
 }
 
 class _CanteenRootState extends State<_CanteenRoot> {
-  var stores = [];
+  late var stores = [];
+  late var userID;
+
+  _CanteenRootState(this.userID);
 
   getAll(BuildContext context) async {
     var baseUrl = "http://delivery.mcatk.com";
     var uri = "/api/getStores/";
     var body = {};
-    http.Response response = await http.post(Uri.parse(baseUrl + uri), body: Convert.jsonEncode(body));
+    http.Response response = await http.post(Uri.parse(baseUrl + uri), body: convert.jsonEncode(body));
     final statusCode = response.statusCode;
     final responseBody = response.body;
-    var result = Convert.jsonDecode(responseBody);
+    var result = convert.jsonDecode(responseBody);
     print('[uri=$uri][statusCode=$statusCode][response=$responseBody]');
 
     setState(() {
@@ -57,7 +71,7 @@ class _CanteenRootState extends State<_CanteenRoot> {
           child: ListView.builder(
             itemCount: stores.length,
             itemBuilder: (context, index) {
-              return _CanteenCard(stores[index]);
+              return _CanteenCard(stores[index], userID);
             },
           ),
         ));
@@ -65,16 +79,17 @@ class _CanteenRootState extends State<_CanteenRoot> {
 }
 
 class _CanteenCard extends StatelessWidget {
-  var store;
+  late var store;
+  late var userID;
 
-  _CanteenCard(this.store);
+  _CanteenCard(this.store, this.userID);
 
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
       onTap: () {
         Navigator.pushNamed(context, '/canteen/canteendisplay',
-            arguments: store);
+            arguments: PassDataStore(store, userID));
       },
       child: Container(
         margin: const EdgeInsets.fromLTRB(16, 13, 16, 10),

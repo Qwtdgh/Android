@@ -1,11 +1,35 @@
-part of 'main.dart';
+import 'dart:convert' as convert;
+import 'package:http/http.dart' as http;
 
-class _DishInfo extends StatelessWidget {
+import 'package:flutter/cupertino.dart';
+import 'package:flutter/material.dart';
+import 'package:smooth_star_rating/smooth_star_rating.dart';
+import 'package:delivery/widgets/fav_button.dart';
+import 'package:delivery/cart.dart';
+
+class _Global {
+
+}
+
+class PassDataDish {
+  final dynamic food;
+  final int userID;
+  final List shoppingList;
+
+  PassDataDish(this.food, this.userID, this.shoppingList);
+}
+
+class DishInfo extends StatelessWidget {
   late var food;
+  late var userID;
+  late List shoppingList;
 
   @override
   Widget build(BuildContext context) {
-    food = ModalRoute.of(context)!.settings.arguments;
+    PassDataDish pack = ModalRoute.of(context)!.settings.arguments as PassDataDish;
+    food = pack.food;
+    userID = pack.userID;
+    shoppingList = pack.shoppingList;
     return Scaffold(
       appBar: AppBar(
         title: const Text('DishInfo'),
@@ -21,20 +45,66 @@ class _DishInfo extends StatelessWidget {
         ],
       ),
       body: Center(
-        child: _DishInfoPage(food),
+        child: _DishInfoPage(food, userID, shoppingList),
       ),
     );
   }
 }
 
-class _DishInfoPage extends StatelessWidget {
+class _DishInfoPage extends StatefulWidget {
   late var food;
-  var shopping_list = List.empty(growable: true);
+  late var userID;
+  late List shoppingList;
 
-  _DishInfoPage(this.food);
+  _DishInfoPage(this.food, this.userID, this.shoppingList);
+
+  @override
+  _DishInfoPageState createState() => _DishInfoPageState(food, userID, shoppingList);
+}
+
+class _DishInfoPageState extends State<_DishInfoPage> {
+  late var food;
+  late var userID;
+  late var starInfo = {};
+  late var avrStar = 0.0;
+  late List shoppingList;
+
+  _DishInfoPageState(this.food, this.userID, this.shoppingList);
+
+  getAll(BuildContext context) async {
+    var baseUrl = "http://delivery.mcatk.com";
+    var uri1 = "/api/androidGetUserFoodEvaluate/";
+    var body1 = {
+      'userID': userID,
+      'foodID': food['foodID'],
+    };
+    http.Response response1 = await http.post(Uri.parse(baseUrl + uri1), body: convert.jsonEncode(body1));
+    final statusCode1 = response1.statusCode;
+    final responseBody1 = response1.body;
+    var result1 = convert.jsonDecode(responseBody1);
+    print('[uri=$uri1][statusCode=$statusCode1][response=$responseBody1]');
+
+    var uri2 = "/api/androidGetFoodEvaluateScore/";
+    var body2 = {
+      'foodID': food['foodID'],
+    };
+    http.Response response2 = await http.post(Uri.parse(baseUrl + uri2), body: convert.jsonEncode(body2));
+    final statusCode2 = response2.statusCode;
+    final responseBody2 = response2.body;
+    var result2 = convert.jsonDecode(responseBody2);
+    print('[uri=$uri2][statusCode=$statusCode2][response=$responseBody2]');
+
+    setState(() {
+      starInfo = result1;
+      avrStar = result2['evaluate'];
+    });
+    print(avrStar);
+    print(starInfo);
+  }
 
   @override
   Widget build(BuildContext context) {
+    getAll(context);
     return Container(
       margin: const EdgeInsets.fromLTRB(16, 13, 16, 0),
       decoration: BoxDecoration(
@@ -46,7 +116,7 @@ class _DishInfoPage extends StatelessWidget {
         children: <Widget>[
           renderDishInfo(), // Row
           renderStars(), // Star
-          renderMyStars(), // My Stars
+          renderMyStars(context), // My Stars
           renderAddToChart(), // Button
           renderComment(context), // ListView
         ],
@@ -91,32 +161,8 @@ class _DishInfoPage extends StatelessWidget {
                     child: Container(
                         // padding: const EdgeInsets.fromLTRB(10, 0, 10, 10),
                         alignment: Alignment.bottomRight,
-                        decoration: const BoxDecoration(
-                          gradient: LinearGradient(
-                            begin: Alignment.topCenter,
-                            end: Alignment.bottomCenter,
-                            colors: [Colors.transparent, Colors.black54],
-                          ),
-                        ),
-                        child: Container(
-                          padding: const EdgeInsets.only(left: 5.0),
-                          height: 40.0,
-                          width: 40.0,
-                          decoration: const BoxDecoration(
-                            borderRadius: BorderRadius.only(
-                              topLeft: Radius.circular(20.0),
-                            ),
-                            color: Color(0xFFF76765),
-                          ),
-                          child: Center(
-                              child: TextButton(
-                            child: const Icon(
-                              Icons.favorite_border,
-                              color: Colors.white,
-                            ),
-                            onPressed: () {},
-                          )),
-                        )),
+                        child: FavButton(userID, food['foodID']),
+                    ),
                   ),
                 ],
               ),
@@ -145,7 +191,7 @@ class _DishInfoPage extends StatelessWidget {
                   style: textStyle,
                 ),
                 Text(
-                  '价格：\t' + food['foodPrice'].toDouble().toStringAsFixed(2),
+                  '价格：\t' + food['foodPrice'],
                   style: textStyle,
                 ),
               ],
@@ -173,14 +219,11 @@ class _DishInfoPage extends StatelessWidget {
             ),
           ),
           SmoothStarRating(
-              allowHalfRating: true,
-              // onRated: (v) {},
               starCount: 5,
-              rating: 3.5,
+              rating: avrStar.toDouble(),
               size: 40.0,
               isReadOnly: true,
               filledIconData: Icons.star,
-              halfFilledIconData: Icons.star_half,
               color: Colors.yellow,
               borderColor: Colors.yellow,
               spacing: 0.0),
@@ -189,7 +232,23 @@ class _DishInfoPage extends StatelessWidget {
     );
   }
 
-  Widget renderMyStars() {
+  setStar(BuildContext context, double v) async {
+    var baseUrl = "http://delivery.mcatk.com";
+    var uri = "/api/evaluateFood/";
+    var body = {
+      'postUserID': userID,
+      'foodID': food['foodID'],
+      'evaluateText': '',
+      'evaluateScore': v,
+    };
+    http.Response response = await http.post(Uri.parse(baseUrl + uri), body: convert.jsonEncode(body));
+    final statusCode = response.statusCode;
+    final responseBody = response.body;
+    var result = convert.jsonDecode(responseBody);
+    print('[uri=$uri][statusCode=$statusCode][response=$responseBody]');
+  }
+
+  Widget renderMyStars(BuildContext context) {
     return Container(
       margin: const EdgeInsets.all(5),
       // constraints: const BoxConstraints.expand(),
@@ -206,14 +265,14 @@ class _DishInfoPage extends StatelessWidget {
             ),
           ),
           SmoothStarRating(
-              allowHalfRating: true,
-              onRated: (v) {},
+              onRated: (v) {
+                setStar(context, v);
+              },
               starCount: 5,
-              rating: 3.5,
+              rating: starInfo == {} ? (starInfo['success'] ? starInfo['evaluate']['evaluateScore'].toDouble() : 0.0) : 0.0,
               size: 40.0,
               isReadOnly: false,
               filledIconData: Icons.star,
-              halfFilledIconData: Icons.star_half,
               color: Colors.grey,
               borderColor: Colors.grey,
               spacing: 0.0),
@@ -255,7 +314,7 @@ class _DishInfoPage extends StatelessWidget {
               ),
             ),
             onPressed: () {
-              shopping_list.add(food);
+              shoppingList.add(food);
             },
           )),
     ]);
@@ -267,7 +326,7 @@ class _DishInfoPage extends StatelessWidget {
       child: Stack(
         fit: StackFit.passthrough,
         children: <Widget>[
-          _CommentDisplay(comments: food['comments']),
+          _CommentDisplay(food['foodEvaluate']),
           Positioned(
             left: 0,
             right: 0,
@@ -286,7 +345,7 @@ class _DishInfoPage extends StatelessWidget {
               child: ElevatedButton(
                 onPressed: () {
                   Navigator.pushNamed(context, '/cart',
-                      arguments: shopping_list);
+                      arguments: PassDataCart(shoppingList, userID));
                 },
                 child: const Icon(Icons.shopping_cart),
               ),
@@ -299,12 +358,9 @@ class _DishInfoPage extends StatelessWidget {
 }
 
 class _CommentDisplay extends StatelessWidget {
-  final List<String> comments;
+  late var comments;
 
-  const _CommentDisplay({
-    Key? key,
-    required this.comments,
-  }) : super(key: key);
+  _CommentDisplay(this.comments);
 
   @override
   Widget build(BuildContext context) {
@@ -317,7 +373,7 @@ class _CommentDisplay extends StatelessWidget {
           shrinkWrap: true,
           itemCount: comments.length,
           itemBuilder: (context, index) {
-            return _CommentCard(comment: comments[index]);
+            return _CommentCard(comments[index]);
           },
         ),
       ),
@@ -326,16 +382,16 @@ class _CommentDisplay extends StatelessWidget {
 }
 
 class _CommentCard extends StatelessWidget {
-  final String comment;
+  late var comment;
 
-  const _CommentCard({Key? key, required this.comment}) : super(key: key);
+  _CommentCard(this.comment);
 
   @override
   Widget build(BuildContext context) {
     return Container(
       padding: const EdgeInsets.fromLTRB(10, 10, 0, 0),
       child: Text(
-        '"' + comment + '"',
+        '"' + comment['evaluateText'] + '"',
         style: const TextStyle(
           fontSize: 16,
           fontWeight: FontWeight.w400,

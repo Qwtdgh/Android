@@ -72,16 +72,6 @@ class _Home_RootState extends State<HomeRootList> {
     // Navigator.pushNamed(context, "/main", arguments: userID);
   }
 
-
-  DishInfo dishInfo = const DishInfo(
-    dishImgUrl:
-    'https://gimg2.baidu.com/image_search/src=http%3A%2F%2Fimgsa.baidu.com%2Fexp%2Fw%3D500%2Fsign%3D449be3d66381800a6ee5890e813433d6%2F8694a4c27d1ed21b9b3734bca26eddc450da3fe8.jpg&refer=http%3A%2F%2Fimgsa.baidu.com&app=2002&size=f9999,10000&q=a80&n=0&g=0n&fmt=jpeg?sec=1640937777&t=f86139b4672f345a1a881cc08deb4aeb',
-    dishName: '宫保鸡丁',
-    dishPlace: '合一食堂',
-    dishPrice: 30000,
-    comments: ['Great', 'Garbage', 'Huge', 'Huge', 'Huge', 'Huge', 'Huge', 'Huge', 'Huge', 'Huge', 'Huge', 'Huge', 'Huge', 'Huge', 'Huge', 'Huge', 'Huge', 'Huge', 'Huge', 'Huge'],
-  );
-
   @override
   Widget build(BuildContext context) {
     getAll(context);
@@ -100,8 +90,7 @@ class _Home_RootState extends State<HomeRootList> {
               childAspectRatio: 1.0,
             ),
             itemBuilder: (context, index) {
-              return _SuggestedDishCard(data: new DishInfo(this.stars[index]["foodUrl"],this.stars[$index]["foodName"]
-              ,this.stars[0]["foodPrice"],this.stars[0]["foodUrl"]));
+              return SuggestedDishCard(stars[index], userID);
             },
           ),
         ));

@@ -1,8 +1,6 @@
 library main;
 
-import 'dart:convert';
-
-import 'package:delivery/widgets/snackbar.dart';
+import 'package:delivery/widgets/dish_card.dart';
 
 import 'http.dart';
 import 'package:flutter/material.dart';
@@ -10,17 +8,13 @@ import 'package:smooth_star_rating/smooth_star_rating.dart';
 import 'package:flutter/cupertino.dart';
 import 'dart:convert' as Convert;
 import 'package:badges/badges.dart';
-import 'dart:async';
 import 'package:http/http.dart' as http;
 
-part 'dishes_display.dart';
-part 'dish_display.dart';
-part 'canteen.dart';
-part 'canteen_display.dart';
+import 'package:delivery/dishes_display.dart';
+import 'package:delivery/canteen.dart';
+
 part 'order_get.dart';
 part 'user.dart';
-part 'cart.dart';
-
 
 
 //void main() => runApp(const MyApp());
@@ -70,8 +64,8 @@ class _BottomSelectionState extends State<_BottomSelection> {
     const TextStyle optionStyle =
         TextStyle(fontSize: 30, fontWeight: FontWeight.bold);
     _widgetOptions = <Widget>[
-      _HomePage(this.userID),
-      _CanteenPage(),
+      HomePage(this.userID),
+      CanteenPage(this.userID),
       _OrderGetPage(),
       _UserPage(this.userID),
     ];

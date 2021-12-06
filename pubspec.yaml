@@ -39,6 +39,7 @@ dependencies:
   smooth_star_rating: 1.1.1
   http: ^0.13.4
   dio: ^4.0.3
+  favorite_button: ^0.0.4
   font_awesome_flutter:
 
 

@@ -216,8 +216,8 @@ class _DishInfoPageState extends State<_DishInfoPage> {
       // constraints: const BoxConstraints.expand(),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.center,
-        children: const [
-          Text(
+        children: [
+          const Text(
             'My Comments:',
             style: TextStyle(
               fontStyle: FontStyle.italic,
@@ -226,23 +226,10 @@ class _DishInfoPageState extends State<_DishInfoPage> {
               color: Colors.black,
             ),
           ),
-          TextField(
-            // focusNode: focusNodeName,
-            // controller: loginNameController,
-            keyboardType: TextInputType.name,
-            style: TextStyle(
-                fontFamily: 'WorkSansSemiBold',
-                fontSize: 16.0,
-                color: Colors.black),
-            decoration: InputDecoration(
-              border: InputBorder.none,
-              hintText: 'User Name',
-              hintStyle: TextStyle(
-                  fontFamily: 'WorkSansSemiBold', fontSize: 17.0),
-            ),
-            /*onSubmitted: (_) {
-              focusNodePassword.requestFocus();
-            },*/
+          Container(
+            color: Colors.red,
+            child: // Text('child'),
+                const TextField(),
           ),
         ],
       ),

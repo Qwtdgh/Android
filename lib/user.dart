@@ -404,6 +404,18 @@ class MyselfListState extends State<MyselfList> {
                         size: 32.0,
                       ),
                     ),
+                    IconButton(
+                      onPressed: () {
+                        //修改信息部分
+                        //需要调用修改信息的函数
+
+                        Navigator.pushNamed(context, "/changePassword");
+                      },
+                      icon: Icon(
+                        Icons.lock,
+                        size: 32.0,
+                      ),
+                    ),
                   ],
                 ),
               ],

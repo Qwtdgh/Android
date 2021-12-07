@@ -1,7 +1,5 @@
 import 'dart:convert' as Convert;
 import 'package:http/http.dart' as http;
-import 'dart:io';
-import 'package:delivery/http.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:delivery/theme.dart';
@@ -13,16 +11,15 @@ class SignIn extends StatefulWidget {
     return _SignInState();
   }
 
-  // @override
-  // _SignInState createState() => _SignInState();
+// @override
+// _SignInState createState() => _SignInState();
 }
 
 class _SignInState extends State<SignIn> {
   TextEditingController loginNameController = TextEditingController();
   TextEditingController loginPasswordController = TextEditingController();
 
-  final FocusNode
-  focusNodeName = FocusNode();
+  final FocusNode focusNodeName = FocusNode();
   final FocusNode focusNodePassword = FocusNode();
 
   bool _obscureTextPassword = true;
@@ -36,11 +33,6 @@ class _SignInState extends State<SignIn> {
 
   @override
   Widget build(BuildContext context) {
-
-    _login() {
-
-    }
-
     return Container(
       padding: const EdgeInsets.only(top: 23.0),
       child: Column(
@@ -173,15 +165,18 @@ class _SignInState extends State<SignIn> {
                           fontFamily: 'WorkSansBold'),
                     ),
                   ),
-                  onPressed: ()
-                  async{
-                    CustomSnackBar(
-                        context, const Text('Login button pressed'));
+                  onPressed: () async {
+                    CustomSnackBar(context, const Text('Login button pressed'));
 
                     var baseUrl = "http://42.192.60.125";
                     var uri = "/api/login/";
-                    var body = {"userName": loginNameController.text, "userPassword": loginPasswordController.text};
-                    http.Response response = await http.post(Uri.parse(baseUrl + uri), body: Convert.jsonEncode(body));
+                    var body = {
+                      "userName": loginNameController.text,
+                      "userPassword": loginPasswordController.text
+                    };
+                    http.Response response = await http.post(
+                        Uri.parse(baseUrl + uri),
+                        body: Convert.jsonEncode(body));
                     final statusCode = response.statusCode;
                     final responseBody = response.body;
                     var result = Convert.jsonDecode(responseBody);
@@ -194,17 +189,22 @@ class _SignInState extends State<SignIn> {
                     var userID = result["userID"];
                     print(userID);
                     bool str = result["success"];
-                    while (str!=true){
-                      CustomSnackBar(
-                          context, const Text('滚你丫的，密码特么不对'));
+                    while (str != true) {
+                      CustomSnackBar(context, const Text('滚你丫的，密码特么不对'));
                       var baseUrl = "http://42.192.60.125";
                       var uri = "/api/login/";
-                      var body = {"userName": loginNameController.text, "userPassword": loginPasswordController.text};
-                      http.Response response = await http.post(Uri.parse(baseUrl + uri), body: Convert.jsonEncode(body));
+                      var body = {
+                        "userName": loginNameController.text,
+                        "userPassword": loginPasswordController.text
+                      };
+                      http.Response response = await http.post(
+                          Uri.parse(baseUrl + uri),
+                          body: Convert.jsonEncode(body));
                       final statusCode = response.statusCode;
                       final responseBody = response.body;
                       var result = Convert.jsonDecode(responseBody);
-                      print('[uri=$uri][statusCode=$statusCode][response=$responseBody]');
+                      print(
+                          '[uri=$uri][statusCode=$statusCode][response=$responseBody]');
 
                       //var http =  HttpRequest("http://delivery.mcatk.com");
 
@@ -212,12 +212,9 @@ class _SignInState extends State<SignIn> {
                       //String? userID = ret["userID"];
                       var userID = result["userID"];
                       str = result["success"];
-
                     }
 
                     Navigator.pushNamed(context, "/main", arguments: userID);
-
-
                   },
                 ),
               )
@@ -256,7 +253,7 @@ class _SignInState extends State<SignIn> {
                   width: 100.0,
                   height: 1.0,
                 ),
-                const Padding(
+                /*const Padding(
                   padding: EdgeInsets.only(left: 15.0, right: 15.0),
                   child: Text(
                     'Or',
@@ -265,7 +262,7 @@ class _SignInState extends State<SignIn> {
                         fontSize: 16.0,
                         fontFamily: 'WorkSansMedium'),
                   ),
-                ),
+                ),*/
                 Container(
                   decoration: const BoxDecoration(
                     gradient: LinearGradient(

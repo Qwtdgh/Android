@@ -18,8 +18,10 @@ class _UserPage extends StatelessWidget {
         "/": (context) => Myself(this.userID),
         "/personalInfo": (context) => PersonalInfo(),
         "/likes": (context) => _Home_Root1(this.userID),
-        "/sendOrder": (context) => _Order_SendRoute(this.userID),
-        "/receiveOrder": (context) => _Order_ReceiveRoute(this.userID),
+        "/sendOrder": (context) => _Order_SendRoute(this.userID, false),
+        "/receiveOrder": (context) => _Order_ReceiveRoute(this.userID, false),
+        "/sendOrderHistory": (context) => _Order_SendRoute(this.userID, true),
+        "/receiveOrderHistory": (context) => _Order_ReceiveRoute(this.userID, true),
         "/changePassword": (context) => TextFieldAndCheckPage(this.userID),
         "/login": (context) => LoginPage(),
         "/main": (context, {arguments}) => Main_Page(),
@@ -210,7 +212,7 @@ class _Home_RootState extends State<HomeRootList> {
       child: GridView.builder(
         itemCount: stars.length,
         gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-          crossAxisCount: 3,
+          crossAxisCount: 2,
           mainAxisSpacing: 1.0,
           crossAxisSpacing: 1.0,
           childAspectRatio: 1.0,
@@ -404,6 +406,18 @@ class MyselfListState extends State<MyselfList> {
                         size: 32.0,
                       ),
                     ),
+                    // IconButton(
+                    //   onPressed: () {
+                    //     //修改信息部分
+                    //     //需要调用修改信息的函数
+                    //
+                    //     Navigator.pushNamed(context, "/changePassword");
+                    //   },
+                    //   icon: Icon(
+                    //     Icons.lock,
+                    //     size: 32.0,
+                    //   ),
+                    // ),
                   ],
                 ),
               ],
@@ -551,6 +565,78 @@ class MyselfListState extends State<MyselfList> {
                           ),
                           Text(
                             "收藏",
+                            style: new TextStyle(
+                              fontFamily: "Ewert",
+                              fontSize: 12,
+                            ),
+                            softWrap: false,
+                          ),
+                        ],
+                      )),
+                  //子组件
+                  badgeColor: Colors.red,
+                  //右上角小红点颜色（默认时为红色）
+                  showBadge: flag2,
+                  //true时刷新时会在右则摆动一下
+                  animationDuration: Duration(seconds: 10),
+                  //小点点在右侧摆动的时间,这里为10秒
+                  toAnimate: true, //允许摆动，false时showBadge会失效
+                ),
+                Badge(
+                  //文本内容Text为空时子组件为null时则返回一个红点，其他值时按实际显示
+                  badgeContent: Text(""),
+                  child: Container(
+                      height: 80,
+                      width: 40,
+                      child: Column(
+                        children: <Widget>[
+                          IconButton(
+                            onPressed: () {
+                              Navigator.pushNamed(context, "/sendOrderHistory");
+                            },
+                            icon: Icon(
+                              Icons.update,
+                              size: 32.0,
+                            ),
+                          ),
+                          Text(
+                            "历史送",
+                            style: new TextStyle(
+                              fontFamily: "Ewert",
+                              fontSize: 12,
+                            ),
+                            softWrap: false,
+                          ),
+                        ],
+                      )),
+                  //子组件
+                  badgeColor: Colors.red,
+                  //右上角小红点颜色（默认时为红色）
+                  showBadge: flag2,
+                  //true时刷新时会在右则摆动一下
+                  animationDuration: Duration(seconds: 10),
+                  //小点点在右侧摆动的时间,这里为10秒
+                  toAnimate: true, //允许摆动，false时showBadge会失效
+                ),
+                Badge(
+                  //文本内容Text为空时子组件为null时则返回一个红点，其他值时按实际显示
+                  badgeContent: Text(""),
+                  child: Container(
+                      height: 80,
+                      width: 40,
+                      child: Column(
+                        children: <Widget>[
+                          IconButton(
+                            onPressed: () {
+                              Navigator.pushNamed(context, "/receiveOrderHistory");
+                            },
+                            icon: Icon(
+                              Icons.playlist_add_check,
+                              size: 32.0,
+                            ),
+                          ),
+                          Text(
+                            "历史订",
                             style: new TextStyle(
                               fontFamily: "Ewert",
                               fontSize: 12,
@@ -727,36 +813,27 @@ List<Item> generateItems(int numberOfItems) {
 
 class MyList extends StatefulWidget {
   late int userID = -1;
-
-  MyList(int userID) {
+  late bool isHistory = false;
+  MyList(int userID, bool isHistory) {
     this.userID = userID;
+    this.isHistory = isHistory;
   }
 
   @override
-  createState() => MyListState(this.userID);
+  createState() => MyListState(this.userID, this.isHistory);
 }
 
 class MyListState extends State<MyList> {
   late int userID = -1;
   late List sendOrders = [];
+  late bool isHistory = false;
 
-  MyListState(int userID) {
+  MyListState(int userID, bool isHistory) {
     this.userID = userID;
+    this.isHistory = isHistory;
   }
 
-  // List<Map<String, String>> sendOrders = [
-  //   {"id": "1", "d": "kk", "rp": "receiver", "time": "11/31"},
-  //   {"id": "2", "d": "kk", "rp": "receiver", "time": "11/31"},
-  //   {"id": "3", "d": "kk", "rp": "receiver", "time": "11/31"},
-  //   {"id": "4", "d": "kk", "rp": "receiver", "time": "11/31"},
-  //   {"id": "5", "d": "kk", "rp": "receiver", "time": "11/31"},
-  //   {"id": "6", "d": "kk", "rp": "receiver", "time": "11/31"},
-  //   {"id": "7", "d": "kk", "rp": "receiver", "time": "11/31"},
-  //   {"id": "8", "d": "kk", "rp": "receiver", "time": "11/31"},
-  //   {"id": "9", "d": "kk", "rp": "receiver", "time": "11/31"},
-  //   {"id": "10", "d": "kk", "rp": "receiver", "time": "11/31"},
-  //   {"id": "11", "d": "kk", "rp": "receiver", "time": "11/31"},
-  // ];
+
 
   getSend() async {
     // CustomSnackBar(context, const Text('Login button pressed'));
@@ -773,8 +850,14 @@ class MyListState extends State<MyList> {
     this.sendOrders = result["userDeliveryOrders"];
     setState(() {
       this.sendOrders = result["userDeliveryOrders"];
-      this.sendOrders.removeWhere((element) =>
-          element["orderCompleted"] == 0 || element["orderCompleted"] == 2);
+      if (!isHistory) {
+        this.sendOrders.removeWhere((element) =>
+        element["orderCompleted"] == 0 || element["orderCompleted"] == 2);
+      } else {
+        this.sendOrders.removeWhere((element) =>
+        element["orderCompleted"] == 0 || element["orderCompleted"] == 1);
+      }
+
     });
   }
 
@@ -855,6 +938,7 @@ class MyListState extends State<MyList> {
                   //height: 400.0,
                   child: ListView.builder(
                       shrinkWrap: true,
+                      physics:NeverScrollableScrollPhysics(),
                       itemCount: sendOrders[index]["food"].length,
                       itemBuilder: (BuildContext context, int fi) {
                         return Container(
@@ -946,9 +1030,11 @@ class MyListState extends State<MyList> {
 
 class _Order_SendRoute extends StatelessWidget {
   late int userID = -1;
+  late bool isHistory = false;
 
-  _Order_SendRoute(int userID) {
+  _Order_SendRoute(int userID, bool isHistory) {
     this.userID = userID;
+    this.isHistory = isHistory;
   }
 
   @override
@@ -961,7 +1047,7 @@ class _Order_SendRoute extends StatelessWidget {
         shadowColor: Colors.yellow,
       ),
       backgroundColor: const Color.fromARGB(255, 239, 239, 239),
-      body: MyList(this.userID),
+      body: MyList(this.userID, this.isHistory),
     );
   }
 }
@@ -969,15 +1055,17 @@ class _Order_SendRoute extends StatelessWidget {
 class ExpansionList extends StatefulWidget {
   late int userID = -1;
   late List isExpands = [];
+  late bool isHistory = false;
 
-  ExpansionList(int userID, List isExpands) {
+  ExpansionList(int userID, List isExpands, isHistory) {
     this.userID = userID;
     this.isExpands = isExpands;
+    this.isHistory = isHistory;
   }
 
   @override
   State createState() {
-    return ExpansionListState(this.userID, this.isExpands);
+    return ExpansionListState(this.userID, this.isExpands, this.isHistory);
   }
 }
 
@@ -985,10 +1073,12 @@ class ExpansionListState extends State<ExpansionList> {
   late int userID = -1;
   late List receiveOrders = [];
   late List isExpands = [];
+  late bool isHistory = false;
 
-  ExpansionListState(int userID, List isExpands) {
+  ExpansionListState(int userID, List isExpands, isHistory) {
     this.userID = userID;
     this.isExpands = isExpands;
+    this.isHistory = isHistory;
   }
 
   // final List<Map<String, String>> receiveOrders = [
@@ -1107,9 +1197,14 @@ class ExpansionListState extends State<ExpansionList> {
     this.receiveOrders = result["userOrders"];
     setState(() {
       this.receiveOrders = result["userOrders"];
-      this
-          .receiveOrders
-          .removeWhere((element) => element["orderCompleted"] == 2);
+      if (!this.isHistory) {
+        this.receiveOrders
+            .removeWhere((element) => element["orderCompleted"] == 2);
+      } else {
+        this.receiveOrders
+            .removeWhere((element) => element["orderCompleted"] == 0 || element["orderCompleted"] == 1);
+      }
+
     });
   }
 
@@ -1174,6 +1269,7 @@ class ExpansionListState extends State<ExpansionList> {
           Container(
             child: ListView.builder(
                 shrinkWrap: true,
+                physics:NeverScrollableScrollPhysics(),
                 itemCount: item["food"].length,
                 itemBuilder: (BuildContext context, int index) {
                   return Container(
@@ -1253,17 +1349,29 @@ class ExpansionListState extends State<ExpansionList> {
               '联系电话：${item["deliveryUserTel"] == null ? '无' : item["deliveryUserTel"]}',
             ),
           ),
-          Container(
-              alignment: Alignment.centerRight,
-              margin: const EdgeInsets.only(right: 10.0),
-              child: ElevatedButton(
-                onPressed: (item["deliveryUserNickName"] == null ? true : false)
-                    ? null
-                    : () {
-                        finishOrder(item["orderID"]);
-                      },
-                child: const Text('已收到'),
-              )),
+          Row(
+            children: [
+              Container(
+                alignment: Alignment.centerLeft,
+                child: Text('${item["deliveryUserTel"] == null ? "无骑手配送" : '预测时间：${item["forecastTime"]}分钟'}'),
+              ),
+              Expanded(
+                  child: Container(
+                      alignment: Alignment.centerRight,
+                      margin: const EdgeInsets.only(right: 10.0),
+                      child: ElevatedButton(
+                        onPressed: (item["deliveryUserNickName"] == null ? true : false)
+                            ? null
+                            : () {
+                          finishOrder(item["orderID"]);
+                        },
+                        child: const Text('已收到'),
+
+                      )),
+              ),
+            ],
+          ),
+
         ],
       );
     }
@@ -1312,9 +1420,11 @@ class ExpansionListState extends State<ExpansionList> {
 class _Order_ReceiveRoute extends StatelessWidget {
   late int userID = -1;
   late List isExpands = [];
+  late bool isHistory = false;
 
-  _Order_ReceiveRoute(int userID) {
+  _Order_ReceiveRoute(int userID, bool isHistory) {
     this.userID = userID;
+    this.isHistory = isHistory;
     for (int i = 0; i < 1000; i++) {
       this.isExpands.add(false);
     }
@@ -1326,7 +1436,7 @@ class _Order_ReceiveRoute extends StatelessWidget {
       appBar: AppBar(
         title: const Text("收餐"),
       ),
-      body: Center(child: ExpansionList(this.userID, this.isExpands)),
+      body: Center(child: ExpansionList(this.userID, this.isExpands, this.isHistory)),
     );
   }
 }

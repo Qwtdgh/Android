@@ -75,6 +75,7 @@ class _CanteenInfoPage extends StatelessWidget {
       color: Colors.black,
     );
     return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
       children: [
         Container(
           margin: const EdgeInsets.fromLTRB(16, 16, 16, 16),
@@ -101,7 +102,7 @@ class _CanteenInfoPage extends StatelessWidget {
           margin: const EdgeInsets.fromLTRB(10, 10, 10, 10),
           padding: const EdgeInsets.all(10),
           decoration: BoxDecoration(
-            color: Colors.orange,
+            border: Border.all(color: Colors.orange),
             borderRadius: BorderRadius.circular(8),
           ),
           child: Center(
@@ -110,21 +111,35 @@ class _CanteenInfoPage extends StatelessWidget {
               // mainAxisAlignment: MainAxisAlignment.start,
               // verticalDirection: Ver,
               children: [
-                Text(
-                  '食堂名称：\t' + store['storeName'],
-                  style: textStyle,
-                ),
-                Text(
-                  '食堂地址：\t' + store['storeAddress'],
-                  style: textStyle,
-                ),
-                Text(
-                  '食堂电话：\t' + store['storeTel'],
-                  style: textStyle,
-                ),
+                renderInfoLine(Icons.local_restaurant, store['storeName']),
+                renderInfoLine(
+                    Icons.place, store['storeAddress']),
+                renderInfoLine(
+                    Icons.phone, store['storeTel']),
               ],
             ),
           ),
+        ),
+      ],
+    );
+  }
+
+  Widget renderInfoLine(IconData icon, String str) {
+    const textStyle = TextStyle(
+      fontSize: 16,
+      fontWeight: FontWeight.w400,
+      color: Colors.black,
+    );
+    return Row(
+      children: [
+        Container(
+            margin: const EdgeInsets.only(
+              right: 4.0,
+            ),
+            child: Icon(icon)),
+        Text(
+          str,
+          style: textStyle,
         ),
       ],
     );

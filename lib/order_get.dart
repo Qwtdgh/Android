@@ -155,6 +155,7 @@ class _Order_Get_List_State extends State<_Order_Get_List> {
                   //height: 400.0,
                   child: ListView.builder(
                       shrinkWrap: true,
+                      physics: NeverScrollableScrollPhysics(),
                       itemCount: MissedOrders[index]["food"].length,
                       itemBuilder: (BuildContext context, int fi) {
                         return Container(

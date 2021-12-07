@@ -8,7 +8,9 @@ import 'package:delivery/widgets/fav_button.dart';
 import 'package:delivery/cart.dart';
 
 class _Global {
-
+  static dynamic food;
+  static int userID = 0;
+  static List shoppingList = [];
 }
 
 class PassDataDish {
@@ -20,16 +22,13 @@ class PassDataDish {
 }
 
 class DishInfo extends StatelessWidget {
-  late var food;
-  late var userID;
-  late List shoppingList;
-
   @override
   Widget build(BuildContext context) {
-    PassDataDish pack = ModalRoute.of(context)!.settings.arguments as PassDataDish;
-    food = pack.food;
-    userID = pack.userID;
-    shoppingList = pack.shoppingList;
+    PassDataDish pack =
+        ModalRoute.of(context)!.settings.arguments as PassDataDish;
+    _Global.food = pack.food;
+    _Global.userID = pack.userID;
+    _Global.shoppingList = pack.shoppingList;
     return Scaffold(
       appBar: AppBar(
         title: const Text('DishInfo'),
@@ -45,40 +44,32 @@ class DishInfo extends StatelessWidget {
         ],
       ),
       body: Center(
-        child: _DishInfoPage(food, userID, shoppingList),
+        child: _DishInfoPage(),
       ),
     );
   }
 }
 
 class _DishInfoPage extends StatefulWidget {
-  late var food;
-  late var userID;
-  late List shoppingList;
-
-  _DishInfoPage(this.food, this.userID, this.shoppingList);
-
   @override
-  _DishInfoPageState createState() => _DishInfoPageState(food, userID, shoppingList);
+  _DishInfoPageState createState() => _DishInfoPageState();
 }
 
 class _DishInfoPageState extends State<_DishInfoPage> {
-  late var food;
-  late var userID;
   late var starInfo = {};
   late var avrStar = 0.0;
-  late List shoppingList;
 
-  _DishInfoPageState(this.food, this.userID, this.shoppingList);
+  _DishInfoPageState();
 
   getAll(BuildContext context) async {
     var baseUrl = "http://delivery.mcatk.com";
     var uri1 = "/api/androidGetUserFoodEvaluate/";
     var body1 = {
-      'userID': userID,
-      'foodID': food['foodID'],
+      'userID': _Global.userID,
+      'foodID': _Global.food['foodID'],
     };
-    http.Response response1 = await http.post(Uri.parse(baseUrl + uri1), body: convert.jsonEncode(body1));
+    http.Response response1 = await http.post(Uri.parse(baseUrl + uri1),
+        body: convert.jsonEncode(body1));
     final statusCode1 = response1.statusCode;
     final responseBody1 = response1.body;
     var result1 = convert.jsonDecode(responseBody1);
@@ -86,9 +77,10 @@ class _DishInfoPageState extends State<_DishInfoPage> {
 
     var uri2 = "/api/androidGetFoodEvaluateScore/";
     var body2 = {
-      'foodID': food['foodID'],
+      'foodID': _Global.food['foodID'],
     };
-    http.Response response2 = await http.post(Uri.parse(baseUrl + uri2), body: convert.jsonEncode(body2));
+    http.Response response2 = await http.post(Uri.parse(baseUrl + uri2),
+        body: convert.jsonEncode(body2));
     final statusCode2 = response2.statusCode;
     final responseBody2 = response2.body;
     var result2 = convert.jsonDecode(responseBody2);
@@ -115,7 +107,7 @@ class _DishInfoPageState extends State<_DishInfoPage> {
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: <Widget>[
           renderDishInfo(), // Row
-          renderStars(), // Star
+          renderMyComment(), // My Comment
           renderMyStars(context), // My Stars
           renderAddToChart(), // Button
           renderComment(context), // ListView
@@ -125,12 +117,8 @@ class _DishInfoPageState extends State<_DishInfoPage> {
   }
 
   Widget renderDishInfo() {
-    const textStyle = TextStyle(
-      fontSize: 16,
-      fontWeight: FontWeight.w400,
-      color: Colors.black,
-    );
     return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
       children: [
         Container(
           margin: const EdgeInsets.fromLTRB(16, 16, 16, 16),
@@ -149,7 +137,7 @@ class _DishInfoPageState extends State<_DishInfoPage> {
                 fit: StackFit.passthrough,
                 children: <Widget>[
                   Image.network(
-                    food['foodUrl'],
+                    _Global.food['foodUrl'],
                     height: 150,
                     fit: BoxFit.cover,
                   ),
@@ -159,9 +147,9 @@ class _DishInfoPageState extends State<_DishInfoPage> {
                     bottom: 0,
                     height: 100,
                     child: Container(
-                        // padding: const EdgeInsets.fromLTRB(10, 0, 10, 10),
-                        alignment: Alignment.bottomRight,
-                        child: FavButton(userID, food['foodID']),
+                      // padding: const EdgeInsets.fromLTRB(10, 0, 10, 10),
+                      alignment: Alignment.bottomRight,
+                      child: FavButton(_Global.userID, _Global.food['foodID']),
                     ),
                   ),
                 ],
@@ -169,36 +157,95 @@ class _DishInfoPageState extends State<_DishInfoPage> {
             ),
           ),
         ),
-        Container(
-          margin: const EdgeInsets.fromLTRB(10, 10, 10, 10),
-          padding: const EdgeInsets.all(10),
-          decoration: BoxDecoration(
-            color: Colors.orange,
-            borderRadius: BorderRadius.circular(8),
-          ),
-          child: Center(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              // mainAxisAlignment: MainAxisAlignment.start,
-              // verticalDirection: Ver,
-              children: [
-                Text(
-                  '名称：\t' + food['foodName'],
-                  style: textStyle,
+        Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Container(
+              margin: const EdgeInsets.fromLTRB(10, 10, 10, 10),
+              padding: const EdgeInsets.all(10),
+              decoration: BoxDecoration(
+                border: Border.all(color: Colors.orange),
+                borderRadius: BorderRadius.circular(8),
+              ),
+              child: Center(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  // mainAxisAlignment: MainAxisAlignment.start,
+                  // verticalDirection: Ver,
+                  children: [
+                    renderInfoLine(Icons.fastfood, _Global.food['foodName']),
+                    renderInfoLine(
+                        Icons.local_restaurant, _Global.food['foodStoreName']),
+                    renderInfoLine(
+                        Icons.attach_money, _Global.food['foodPrice']),
+                  ],
                 ),
-                Text(
-                  '食堂：\t' + food['foodStoreName'],
-                  style: textStyle,
-                ),
-                Text(
-                  '价格：\t' + food['foodPrice'],
-                  style: textStyle,
-                ),
-              ],
+              ),
             ),
-          ),
+            renderStars(),
+          ],
         ),
       ],
+    );
+  }
+
+  Widget renderInfoLine(IconData icon, String str) {
+    const textStyle = TextStyle(
+      fontSize: 16,
+      fontWeight: FontWeight.w400,
+      color: Colors.black,
+    );
+    return Row(
+      children: [
+        Container(
+            margin: const EdgeInsets.only(
+              right: 4.0,
+            ),
+            child: Icon(icon)),
+        Text(
+          str,
+          style: textStyle,
+        ),
+      ],
+    );
+  }
+
+  Widget renderMyComment() {
+    return Container(
+      margin: const EdgeInsets.all(5),
+      // constraints: const BoxConstraints.expand(),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: const [
+          Text(
+            'My Comments:',
+            style: TextStyle(
+              fontStyle: FontStyle.italic,
+              fontSize: 20,
+              fontWeight: FontWeight.w700,
+              color: Colors.black,
+            ),
+          ),
+          TextField(
+            // focusNode: focusNodeName,
+            // controller: loginNameController,
+            keyboardType: TextInputType.name,
+            style: TextStyle(
+                fontFamily: 'WorkSansSemiBold',
+                fontSize: 16.0,
+                color: Colors.black),
+            decoration: InputDecoration(
+              border: InputBorder.none,
+              hintText: 'User Name',
+              hintStyle: TextStyle(
+                  fontFamily: 'WorkSansSemiBold', fontSize: 17.0),
+            ),
+            /*onSubmitted: (_) {
+              focusNodePassword.requestFocus();
+            },*/
+          ),
+        ],
+      ),
     );
   }
 
@@ -207,26 +254,21 @@ class _DishInfoPageState extends State<_DishInfoPage> {
       margin: const EdgeInsets.all(5),
       // constraints: const BoxConstraints.expand(),
       child: Row(
-        mainAxisAlignment: MainAxisAlignment.center,
+        mainAxisAlignment: MainAxisAlignment.start,
         children: [
-          const Text(
-            'Ratings:',
-            style: TextStyle(
+          const Icon(
+            Icons.star_rounded,
+            color: Colors.orange,
+          ),
+          Text(
+            avrStar.toString(),
+            style: const TextStyle(
               fontStyle: FontStyle.italic,
-              fontSize: 20,
-              fontWeight: FontWeight.w700,
-              color: Colors.black,
+              fontSize: 15,
+              fontWeight: FontWeight.w600,
+              color: Colors.orange,
             ),
           ),
-          SmoothStarRating(
-              starCount: 5,
-              rating: avrStar.toDouble(),
-              size: 40.0,
-              isReadOnly: true,
-              filledIconData: Icons.star,
-              color: Colors.yellow,
-              borderColor: Colors.yellow,
-              spacing: 0.0),
         ],
       ),
     );
@@ -236,12 +278,13 @@ class _DishInfoPageState extends State<_DishInfoPage> {
     var baseUrl = "http://delivery.mcatk.com";
     var uri = "/api/evaluateFood/";
     var body = {
-      'postUserID': userID,
-      'foodID': food['foodID'],
+      'postUserID': _Global.userID,
+      'foodID': _Global.food['foodID'],
       'evaluateText': '',
       'evaluateScore': v,
     };
-    http.Response response = await http.post(Uri.parse(baseUrl + uri), body: convert.jsonEncode(body));
+    http.Response response = await http.post(Uri.parse(baseUrl + uri),
+        body: convert.jsonEncode(body));
     final statusCode = response.statusCode;
     final responseBody = response.body;
     var result = convert.jsonDecode(responseBody);
@@ -269,7 +312,11 @@ class _DishInfoPageState extends State<_DishInfoPage> {
                 setStar(context, v);
               },
               starCount: 5,
-              rating: starInfo == {} ? (starInfo['success'] ? starInfo['evaluate']['evaluateScore'].toDouble() : 0.0) : 0.0,
+              rating: starInfo == {}
+                  ? (starInfo['success']
+                      ? starInfo['evaluate']['evaluateScore'].toDouble()
+                      : 0.0)
+                  : 0.0,
               size: 40.0,
               isReadOnly: false,
               filledIconData: Icons.star,
@@ -314,7 +361,7 @@ class _DishInfoPageState extends State<_DishInfoPage> {
               ),
             ),
             onPressed: () {
-              shoppingList.add(food);
+              _Global.shoppingList.add(_Global.food);
             },
           )),
     ]);
@@ -326,7 +373,7 @@ class _DishInfoPageState extends State<_DishInfoPage> {
       child: Stack(
         fit: StackFit.passthrough,
         children: <Widget>[
-          _CommentDisplay(food['foodEvaluate']),
+          _CommentDisplay(_Global.food['foodEvaluate']),
           Positioned(
             left: 0,
             right: 0,
@@ -345,7 +392,8 @@ class _DishInfoPageState extends State<_DishInfoPage> {
               child: ElevatedButton(
                 onPressed: () {
                   Navigator.pushNamed(context, '/cart',
-                      arguments: PassDataCart(shoppingList, userID));
+                      arguments:
+                          PassDataCart(_Global.shoppingList, _Global.userID));
                 },
                 child: const Icon(Icons.shopping_cart),
               ),

@@ -1042,7 +1042,7 @@ class _Order_SendRoute extends StatelessWidget {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('送餐'),
+        title: Text("${this.isHistory ? "送餐历史" : "送餐"}"),
         shadowColor: Colors.yellow,
       ),
       backgroundColor: const Color.fromARGB(255, 239, 239, 239),
@@ -1323,107 +1323,14 @@ class _Order_ReceiveRoute extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text("收餐"),
+        title: Text("${this.isHistory ? "订餐历史" : "订餐"}"),
       ),
-      body: Center(child: ExpansionList(this.userID, this.isExpands, this.isHistory)),
+      body: Container(
+          child: ExpansionList(this.userID, this.isExpands, this.isHistory)
+      ),
     );
   }
 }
 
-// class _ExpansionPanelPageState extends State<HistoryOrder> {
-//   List<Item> _data = generateItems(20);
-//
-//   @override
-//   Widget build(BuildContext context) {
-//     return new MaterialApp(
-//         home: Scaffold(
-//       appBar: AppBar(
-//         title: Text('HistoryOrder'),
-//         leading: new IconButton(
-//           //这是图标长按会出现的提示信息，返回按钮这么常用，应该不需要吧
-//           //tooltip: '返回上一页',
-//           icon: const Icon(Icons.arrow_back),
-//           onPressed: () {
-//             Navigator.pushNamed(context, "/");
-// //            Navigator.push(context, MaterialPageRoute(builder: (context) {
-// //              return SecondScreen();
-// //            }));
-//           },
-//         ),
-//       ),
-//       body: SingleChildScrollView(
-//         child: Container(
-//           child: _buildPanel(),
-//         ),
-//       ),
-//     ));
-//   }
-//
-//   Widget _buildPanel() {
-//     return ExpansionPanelList(
-//       expansionCallback: (int index, bool isExpanded) {
-//         setState(() {
-//           _data[index].isExpanded = !isExpanded;
-//         });
-//       },
-//       children: _data.map<ExpansionPanel>((Item item) {
-//         return ExpansionPanel(
-//           headerBuilder: (BuildContext context, bool isExpanded) {
-//             return ListTile(
-//               title: Text(item.headerValue),
-//             );
-//           },
-//           body: ListTile(
-//               title: Text(item.expandedValue),
-//               subtitle: Text('To delete this panel, tap the trash can icon'),
-//               trailing: Icon(Icons.delete),
-//               onTap: () {
-//                 setState(() {
-//                   _data.removeWhere((currentItem) => item == currentItem);
-//                 });
-//               }),
-//           isExpanded: item.isExpanded,
-//         );
-//       }).toList(),
-//     );
-//   }
-// }
-// import 'package:flutter/material.dart';
-// import 'package:badges/badges.dart';
-// void main() {
-//   runApp(MyApp());
-// }
-//
-// class MyApp extends StatelessWidget {
-//   @override
-//   Widget build(BuildContext context) {
-//     String a = "1";
-//     bool flag = true;
-//     if (a == "") {
-//       flag = false;
-//     }
-//     return MaterialApp(
-//       title: 'Flutter',
-//       home: Scaffold(
-//         body: Center(
-//           //小红点组件
-//           // child: Badge.before(
-//           //     value: "Text", // value to show inside the badge
-//           //     child: new Text("button") // text to append (required)
-//           // )
-//           child:Badge(
-//             //文本内容Text为空时子组件为null时则返回一个红点，其他值时按实际显示
-//             badgeContent:Text(""),
-//             child: Text("aaa"), //子组件
-//             badgeColor: Colors.red,  //右上角小红点颜色（默认时为红色）
-//             showBadge: flag,//true时刷新时会在右则摆动一下
-//             animationDuration:Duration(seconds: 10),//小点点在右侧摆动的时间,这里为10秒
-//             toAnimate:true, //允许摆动，false时showBadge会失效
-//
-//           ),
-//         ),
-//       ),
-//     );
-//   }
-// }
+
 

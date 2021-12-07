@@ -212,7 +212,7 @@ class _Home_RootState extends State<HomeRootList> {
       child: GridView.builder(
         itemCount: stars.length,
         gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-          crossAxisCount: 2,
+          crossAxisCount: 3,
           mainAxisSpacing: 1.0,
           crossAxisSpacing: 1.0,
           childAspectRatio: 1.0,
@@ -251,6 +251,8 @@ class MyselfListState extends State<MyselfList> {
   late String userTel = "";
   late List sendOrders = [];
   late List receiveOrders = [];
+  late List sendOrdersHistory = [];
+  late List receiveOrdersHistory = [];
   late List likes = [];
   late String iconUrl = "";
 
@@ -269,22 +271,25 @@ class MyselfListState extends State<MyselfList> {
     final statusCode = response.statusCode;
     final responseBody = response.body;
     var result = convert.jsonDecode(responseBody);
-    print('[uri=$uri][statusCode=$statusCode][response=$responseBody]');
+    //print('[uri=$uri][statusCode=$statusCode][response=$responseBody]');
 
-    //var http =  HttpRequest("http://delivery.mcatk.com");
+    this.sendOrders = [];
+    this.receiveOrders = [];
+    this.sendOrdersHistory = [];
+    this.receiveOrdersHistory = [];
+    this.sendOrders.addAll(result["userDeliveryOrders"]);
+    this.receiveOrders.addAll(result["userOrders"]);
+    this.sendOrdersHistory.addAll(result["userDeliveryOrders"]);
+    this.receiveOrdersHistory.addAll(result["userOrders"]);
 
-    //Map<String, String> ret = http.post("/api/login/", body) as Map<String, String>;
-    //String? userID = ret["userID"];
-    var userID = result["userID"];
-    print(userID);
     setState(() {
       this.userNickname = result["userNickName"];
       this.userAddress = result["userAddress"];
       this.userTel = result["userTel"];
       this.receiveOrders.removeWhere((element) => element["orderCompleted"] == 2);
-
       this.sendOrders.removeWhere((element) => element["orderCompleted"] == 0 || element["orderCompleted"] == 2);
-
+      this.receiveOrdersHistory.removeWhere((element) => element["orderCompleted"] == 0 || element["orderCompleted"] == 1);
+      this.sendOrdersHistory.removeWhere((element) => element["orderCompleted"] == 1);
       // this.sendOrders = result["userDeliveryOrders"];
       this.likes = result["userStars"];
       this.iconUrl = result["userIconUrl"];
@@ -406,18 +411,6 @@ class MyselfListState extends State<MyselfList> {
                         size: 32.0,
                       ),
                     ),
-                    // IconButton(
-                    //   onPressed: () {
-                    //     //修改信息部分
-                    //     //需要调用修改信息的函数
-                    //
-                    //     Navigator.pushNamed(context, "/changePassword");
-                    //   },
-                    //   icon: Icon(
-                    //     Icons.lock,
-                    //     size: 32.0,
-                    //   ),
-                    // ),
                   ],
                 ),
               ],
@@ -426,7 +419,7 @@ class MyselfListState extends State<MyselfList> {
     }
 
     Card _shapeCard0(BuildContext context, String str, String route) {
-      bool flag0 = true, flag1 = true, flag2 = true;
+      bool flag0 = true, flag1 = true, flag2 = true, flag3 = true, flag4 = true;
       if (this.sendOrders.isEmpty) {
         flag0 = false;
       }
@@ -435,6 +428,12 @@ class MyselfListState extends State<MyselfList> {
       }
       if (this.likes.isEmpty) {
         flag2 = false;
+      }
+      if (this.sendOrdersHistory.isEmpty) {
+        flag3 = false;
+      }
+      if (this.receiveOrdersHistory.isEmpty) {
+        flag4 = false;
       }
 
       return Card(
@@ -584,7 +583,7 @@ class MyselfListState extends State<MyselfList> {
                 ),
                 Badge(
                   //文本内容Text为空时子组件为null时则返回一个红点，其他值时按实际显示
-                  badgeContent: Text(""),
+                  badgeContent: Text('${this.sendOrdersHistory.length}'),
                   child: Container(
                       height: 80,
                       width: 40,
@@ -612,7 +611,7 @@ class MyselfListState extends State<MyselfList> {
                   //子组件
                   badgeColor: Colors.red,
                   //右上角小红点颜色（默认时为红色）
-                  showBadge: flag2,
+                  showBadge: flag3,
                   //true时刷新时会在右则摆动一下
                   animationDuration: Duration(seconds: 10),
                   //小点点在右侧摆动的时间,这里为10秒
@@ -620,7 +619,7 @@ class MyselfListState extends State<MyselfList> {
                 ),
                 Badge(
                   //文本内容Text为空时子组件为null时则返回一个红点，其他值时按实际显示
-                  badgeContent: Text(""),
+                  badgeContent: Text('${this.receiveOrdersHistory.length}'),
                   child: Container(
                       height: 80,
                       width: 40,
@@ -648,7 +647,7 @@ class MyselfListState extends State<MyselfList> {
                   //子组件
                   badgeColor: Colors.red,
                   //右上角小红点颜色（默认时为红色）
-                  showBadge: flag2,
+                  showBadge: flag4,
                   //true时刷新时会在右则摆动一下
                   animationDuration: Duration(seconds: 10),
                   //小点点在右侧摆动的时间,这里为10秒
@@ -998,29 +997,29 @@ class MyListState extends State<MyList> {
                         );
                       }),
                 ),
-                Row(
-                  children: [
-                    Expanded(
-                        child: Container(
-                      alignment: Alignment.centerRight,
-                      margin: const EdgeInsets.only(right: 10.0, top: 20.0),
-                      child: ElevatedButton(
-                        style: ElevatedButton.styleFrom(
-                            shadowColor: Colors.red,
-                            fixedSize: const Size.fromHeight(10)),
-                        child: const Text(
-                          '已送达',
-                          style: TextStyle(fontSize: 15.0),
-                        ),
-                        onPressed: () {
-                          setState(() {
-                            sendOrders.removeAt(index);
-                          });
-                        },
-                      ),
-                    ))
-                  ],
-                ),
+                // Row(
+                //   children: [
+                //     Expanded(
+                //         child: Container(
+                //       alignment: Alignment.centerRight,
+                //       margin: const EdgeInsets.only(right: 10.0, top: 20.0),
+                //       child: ElevatedButton(
+                //         style: ElevatedButton.styleFrom(
+                //             shadowColor: Colors.red,
+                //             fixedSize: const Size.fromHeight(10)),
+                //         child: const Text(
+                //           '已送达',
+                //           style: TextStyle(fontSize: 15.0),
+                //         ),
+                //         onPressed: () {
+                //           setState(() {
+                //             sendOrders.removeAt(index);
+                //           });
+                //         },
+                //       ),
+                //     ))
+                //   ],
+                // ),
               ],
             ),
           );
@@ -1081,107 +1080,7 @@ class ExpansionListState extends State<ExpansionList> {
     this.isHistory = isHistory;
   }
 
-  // final List<Map<String, String>> receiveOrders = [
-  //   {
-  //     "time": "11-30",
-  //     "shop": "食堂",
-  //     "foodname": "炒饭",
-  //     "foodprice": "88",
-  //     "delivername": "李明",
-  //     "phone": "13833615605",
-  //     "isExpanded": "0"
-  //   },
-  //   {
-  //     "time": "11-30",
-  //     "shop": "食堂",
-  //     "foodname": "炒饭",
-  //     "foodprice": "88",
-  //     "delivername": "李明",
-  //     "phone": "13833615605",
-  //     "isExpanded": "0"
-  //   },
-  //   {
-  //     "time": "11-30",
-  //     "shop": "食堂",
-  //     "foodname": "炒饭",
-  //     "foodprice": "88",
-  //     "delivername": "李明",
-  //     "phone": "13833615605",
-  //     "isExpanded": "0"
-  //   },
-  //   {
-  //     "time": "11-30",
-  //     "shop": "食堂",
-  //     "foodname": "炒饭",
-  //     "foodprice": "88",
-  //     "delivername": "李明",
-  //     "phone": "13833615605",
-  //     "isExpanded": "0"
-  //   },
-  //   {
-  //     "time": "11-30",
-  //     "shop": "食堂",
-  //     "foodname": "炒饭",
-  //     "foodprice": "88",
-  //     "delivername": "李明",
-  //     "phone": "13833615605",
-  //     "isExpanded": "0"
-  //   },
-  //   {
-  //     "time": "11-30",
-  //     "shop": "食堂",
-  //     "foodname": "炒饭",
-  //     "foodprice": "88",
-  //     "delivername": "李明",
-  //     "phone": "13833615605",
-  //     "isExpanded": "0"
-  //   },
-  //   {
-  //     "time": "11-30",
-  //     "shop": "食堂",
-  //     "foodname": "炒饭",
-  //     "foodprice": "88",
-  //     "delivername": "李明",
-  //     "phone": "13833615605",
-  //     "isExpanded": "0"
-  //   },
-  //   {
-  //     "time": "11-30",
-  //     "shop": "食堂",
-  //     "foodname": "炒饭",
-  //     "foodprice": "88",
-  //     "delivername": "李明",
-  //     "phone": "13833615605",
-  //     "isExpanded": "0"
-  //   },
-  //   {
-  //     "time": "11-30",
-  //     "shop": "食堂",
-  //     "foodname": "炒饭",
-  //     "foodprice": "88",
-  //     "delivername": "李明",
-  //     "phone": "13833615605",
-  //     "isExpanded": "0"
-  //   },
-  //   {
-  //     "time": "11-30",
-  //     "shop": "食堂",
-  //     "foodname": "炒饭",
-  //     "foodprice": "88",
-  //     "delivername": "李明",
-  //     "phone": "13833615605",
-  //     "isExpanded": "0"
-  //   },
-  //   {
-  //     "time": "11-30",
-  //     "shop": "食堂",
-  //     "foodname": "炒饭",
-  //     "foodprice": "88",
-  //     "delivername": "李明",
-  //     "phone": "13833615605",
-  //     "isExpanded": "0"
-  //   },
-  // ];
+
   getReceive() async {
     // CustomSnackBar(context, const Text('Login button pressed'));
     // int length = 0;
@@ -1214,18 +1113,8 @@ class ExpansionListState extends State<ExpansionList> {
     var body = {"orderID": orderID.toString()};
     http.Response response = await http.post(Uri.parse(baseUrl + uri),
         body: convert.jsonEncode(body));
-    //final statusCode = response.statusCode;
-    //final responseBody = response.body;
-    //var result = Convert.jsonDecode(responseBody);
-    //print('[uri=$uri][statusCode=$statusCode][response=$responseBody]');
   }
 
-  // @override
-  // void initState() {
-  //   super.initState();
-  //   getReceive();
-  //   this.receiveOrders =
-  // }
 
   @override
   Widget build(BuildContext context) {
@@ -1353,19 +1242,19 @@ class ExpansionListState extends State<ExpansionList> {
             children: [
               Container(
                 alignment: Alignment.centerLeft,
-                child: Text('${item["deliveryUserTel"] == null ? "无骑手配送" : '预测时间：${item["forecastTime"]}分钟'}'),
+                child: Text('${ this.isHistory ?  "" : item["deliveryUserTel"] == null ? "无骑手配送" : '预测时间：${item["forecastTime"]}分钟'}'),
               ),
               Expanded(
                   child: Container(
                       alignment: Alignment.centerRight,
                       margin: const EdgeInsets.only(right: 10.0),
                       child: ElevatedButton(
-                        onPressed: (item["deliveryUserNickName"] == null ? true : false)
+                        onPressed: (item["deliveryUserNickName"] == null || this.isHistory ? true : false)
                             ? null
                             : () {
                           finishOrder(item["orderID"]);
                         },
-                        child: const Text('已收到'),
+                        child: Text('${this.isHistory ? "已收到": "收货"}'),
 
                       )),
               ),
@@ -1537,3 +1426,4 @@ class _Order_ReceiveRoute extends StatelessWidget {
 //     );
 //   }
 // }
+

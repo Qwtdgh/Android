@@ -66,7 +66,7 @@ class _DishInfoPageState extends State<_DishInfoPage> {
   late var foodEvaluates = [];
 
   getAll(BuildContext context) async {
-    var baseUrl = "http://delivery.mcatk.com";
+    var baseUrl = "http://42.192.60.125";
     var uri1 = "/api/androidGetUserFoodEvaluate/";
     var body1 = {
       'userID': _Global.userID,

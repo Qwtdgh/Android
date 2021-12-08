@@ -106,7 +106,7 @@ class TextFieldAndCheckPageState extends State<TextFieldAndCheckPage> {
               print(userID);
               Navigator.pushNamed(context, "/login");
             },
-            child: Text('重新登陆你丫的'),
+            child: Text('重新登陆'),
           ),
         ],
       ),
@@ -212,7 +212,7 @@ class _Home_RootState extends State<HomeRootList> {
       child: GridView.builder(
         itemCount: stars.length,
         gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-          crossAxisCount: 3,
+          crossAxisCount: 2,
           mainAxisSpacing: 1.0,
           crossAxisSpacing: 1.0,
           childAspectRatio: 1.0,
@@ -271,7 +271,7 @@ class MyselfListState extends State<MyselfList> {
     final statusCode = response.statusCode;
     final responseBody = response.body;
     var result = convert.jsonDecode(responseBody);
-    //print('[uri=$uri][statusCode=$statusCode][response=$responseBody]');
+    print('[uri=$uri][statusCode=$statusCode][response=$responseBody]');
 
     this.sendOrders = [];
     this.receiveOrders = [];
@@ -411,6 +411,18 @@ class MyselfListState extends State<MyselfList> {
                         size: 32.0,
                       ),
                     ),
+                    // IconButton(
+                    //   onPressed: () {
+                    //     //修改信息部分
+                    //     //需要调用修改信息的函数
+                    //
+                    //     Navigator.pushNamed(context, "/changePassword");
+                    //   },
+                    //   icon: Icon(
+                    //     Icons.lock,
+                    //     size: 32.0,
+                    //   ),
+                    // ),
                   ],
                 ),
               ],
@@ -1113,8 +1125,18 @@ class ExpansionListState extends State<ExpansionList> {
     var body = {"orderID": orderID.toString()};
     http.Response response = await http.post(Uri.parse(baseUrl + uri),
         body: convert.jsonEncode(body));
+    //final statusCode = response.statusCode;
+    //final responseBody = response.body;
+    //var result = Convert.jsonDecode(responseBody);
+    //print('[uri=$uri][statusCode=$statusCode][response=$responseBody]');
   }
 
+  // @override
+  // void initState() {
+  //   super.initState();
+  //   getReceive();
+  //   this.receiveOrders =
+  // }
 
   @override
   Widget build(BuildContext context) {

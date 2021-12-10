@@ -293,6 +293,7 @@ class MyselfListState extends State<MyselfList> {
       // this.sendOrders = result["userDeliveryOrders"];
       this.likes = result["userStars"];
       this.iconUrl = result["userIconUrl"];
+      print(iconUrl);
     });
     // Navigator.pushNamed(context, "/main", arguments: userID);
   }
@@ -335,7 +336,7 @@ class MyselfListState extends State<MyselfList> {
                   Container(
                       width: 100,
                       height: 100,
-                      child: Image.asset(this.iconUrl)),
+                      child: Image.network(this.iconUrl)),
                   Text('${this.userNickname}'),
                 ])),
       );

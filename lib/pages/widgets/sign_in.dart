@@ -190,7 +190,7 @@ class _SignInState extends State<SignIn> {
                     print(userID);
                     bool str = result["success"];
                     while (str != true) {
-                      CustomSnackBar(context, const Text('滚你丫的，密码特么不对'));
+                      CustomSnackBar(context, const Text('密码不对'));
                       var baseUrl = "http://42.192.60.125";
                       var uri = "/api/login/";
                       var body = {

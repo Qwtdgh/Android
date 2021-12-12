@@ -11,7 +11,8 @@ import 'package:badges/badges.dart';
 import 'package:http/http.dart' as http;
 
 import 'package:delivery/dishes_display.dart';
-import 'package:delivery/canteen.dart';
+
+import 'canteens_display.dart';
 
 part 'order_get.dart';
 part 'user.dart';

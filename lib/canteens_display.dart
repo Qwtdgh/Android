@@ -9,7 +9,9 @@ import 'package:delivery/cart.dart';
 
 class CanteenPage extends StatelessWidget {
   late var userID;
+
   CanteenPage(this.userID);
+
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
@@ -31,7 +33,9 @@ class CanteenPage extends StatelessWidget {
 
 class _CanteenRoot extends StatefulWidget {
   late var userID;
+
   _CanteenRoot(this.userID);
+
   @override
   _CanteenRootState createState() => _CanteenRootState(userID);
 }
@@ -46,7 +50,8 @@ class _CanteenRootState extends State<_CanteenRoot> {
     var baseUrl = "http://42.192.60.125";
     var uri = "/api/getStores/";
     var body = {};
-    http.Response response = await http.post(Uri.parse(baseUrl + uri), body: convert.jsonEncode(body));
+    http.Response response = await http.post(Uri.parse(baseUrl + uri),
+        body: convert.jsonEncode(body));
     final statusCode = response.statusCode;
     final responseBody = response.body;
     var result = convert.jsonDecode(responseBody);

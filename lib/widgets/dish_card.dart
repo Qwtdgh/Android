@@ -14,7 +14,8 @@ class SuggestedDishCard extends StatelessWidget {
   Widget build(BuildContext context) {
     return GestureDetector(
       onTap: () {
-        Navigator.pushNamed(context, '/home/dishdisplay', arguments: PassDataDish(topFood, userID, []));
+        Navigator.pushNamed(context, '/home/dishdisplay',
+            arguments: PassDataDish(topFood, userID, []));
       },
       child: Container(
         margin: const EdgeInsets.fromLTRB(16, 13, 16, 0),

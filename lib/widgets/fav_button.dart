@@ -11,7 +11,6 @@ class _Global {
 }
 
 class FavButton extends StatefulWidget {
-
   FavButton(userID, foodID) {
     _Global.userID = userID;
     _Global.foodID = foodID;
@@ -31,18 +30,17 @@ class _FavButtonState extends State<FavButton> {
       width: 40.0,
       child: Center(
           child: FavoriteButton(
-            isFavorite: _Global.isFav,
-            iconDisabledColor: Colors.white,
-            iconSize: 30.0,
-            valueChanged: (_isFavorite) {
-              if (_isFavorite) {
-                setFav(context);
-              } else {
-                unsetFav(context);
-              }
-            },
-          )
-      ),
+        isFavorite: _Global.isFav,
+        iconDisabledColor: Colors.white,
+        iconSize: 30.0,
+        valueChanged: (_isFavorite) {
+          if (_isFavorite) {
+            setFav(context);
+          } else {
+            unsetFav(context);
+          }
+        },
+      )),
     );
   }
 
@@ -53,7 +51,8 @@ class _FavButtonState extends State<FavButton> {
       'userID': _Global.userID,
       'foodID': _Global.foodID,
     };
-    http.Response response = await http.post(Uri.parse(baseUrl + uri), body: convert.jsonEncode(body));
+    http.Response response = await http.post(Uri.parse(baseUrl + uri),
+        body: convert.jsonEncode(body));
     final statusCode = response.statusCode;
     final responseBody = response.body;
     // print('[uri=$uri][statusCode=$statusCode][response=$responseBody]');
@@ -66,7 +65,8 @@ class _FavButtonState extends State<FavButton> {
       'userID': _Global.userID,
       'foodID': _Global.foodID,
     };
-    http.Response response = await http.post(Uri.parse(baseUrl + uri), body: convert.jsonEncode(body));
+    http.Response response = await http.post(Uri.parse(baseUrl + uri),
+        body: convert.jsonEncode(body));
     final statusCode = response.statusCode;
     final responseBody = response.body;
     // print('[uri=$uri][statusCode=$statusCode][response=$responseBody]');
@@ -79,7 +79,8 @@ class _FavButtonState extends State<FavButton> {
       'userID': _Global.userID,
       'foodID': _Global.foodID,
     };
-    http.Response response = await http.post(Uri.parse(baseUrl + uri), body: convert.jsonEncode(body));
+    http.Response response = await http.post(Uri.parse(baseUrl + uri),
+        body: convert.jsonEncode(body));
     final statusCode = response.statusCode;
     final responseBody = response.body;
     var result = convert.jsonDecode(responseBody);

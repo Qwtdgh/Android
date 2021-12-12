@@ -18,7 +18,8 @@ class CanteenInfo extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    PassDataStore tmp = ModalRoute.of(context)!.settings.arguments as PassDataStore;
+    PassDataStore tmp =
+        ModalRoute.of(context)!.settings.arguments as PassDataStore;
     store = tmp.store;
     userID = tmp.userID;
     return Scaffold(
@@ -112,10 +113,8 @@ class _CanteenInfoPage extends StatelessWidget {
               // verticalDirection: Ver,
               children: [
                 renderInfoLine(Icons.local_restaurant, store['storeName']),
-                renderInfoLine(
-                    Icons.place, store['storeAddress']),
-                renderInfoLine(
-                    Icons.phone, store['storeTel']),
+                renderInfoLine(Icons.place, store['storeAddress']),
+                renderInfoLine(Icons.phone, store['storeTel']),
               ],
             ),
           ),
@@ -171,7 +170,8 @@ class _CanteenInfoPage extends StatelessWidget {
                 ),
                 child: ElevatedButton(
                   onPressed: () {
-                    Navigator.pushNamed(context, '/cart', arguments: PassDataCart(shoppingList, userID));
+                    Navigator.pushNamed(context, '/cart',
+                        arguments: PassDataCart(shoppingList, userID));
                   },
                   child: const Icon(Icons.shopping_cart),
                 ),
@@ -188,6 +188,7 @@ class _MenuRoot extends StatelessWidget {
   late var userID;
   late var foodList;
   late var shoppingList;
+
   _MenuRoot(this.foodList, this.userID, this.shoppingList);
 
   @override
@@ -220,7 +221,8 @@ class _MenuSuggestedDishCard extends StatelessWidget {
   Widget build(BuildContext context) {
     return GestureDetector(
       onTap: () {
-        Navigator.pushNamed(context, '/canteen/dishdisplay', arguments: PassDataDish(food, userID, shoppingList));
+        Navigator.pushNamed(context, '/canteen/dishdisplay',
+            arguments: PassDataDish(food, userID, shoppingList));
       },
       child: Container(
         margin: const EdgeInsets.fromLTRB(1, 1, 1, 1),

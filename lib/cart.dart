@@ -16,7 +16,6 @@ class _Global {
 }
 
 class ShoppingCart extends StatelessWidget {
-
   @override
   Widget build(BuildContext context) {
     var tmp = ModalRoute.of(context)!.settings.arguments as PassDataCart;
@@ -60,7 +59,8 @@ class ShoppingCart extends StatelessWidget {
       'userID': _Global.userID,
       'foodList': list,
     };
-    http.Response response = await http.post(Uri.parse(baseUrl + uri), body: convert.jsonEncode(body));
+    http.Response response = await http.post(Uri.parse(baseUrl + uri),
+        body: convert.jsonEncode(body));
     final statusCode = response.statusCode;
     final responseBody = response.body;
     print('[uri=$uri][statusCode=$statusCode][response=$responseBody]');
@@ -68,7 +68,6 @@ class ShoppingCart extends StatelessWidget {
 }
 
 class _CartBody extends StatelessWidget {
-
   @override
   Widget build(BuildContext context) {
     return _GuessYouLikePage();
@@ -81,7 +80,6 @@ class _GuessYouLikePage extends StatefulWidget {
 }
 
 class _GuessYouLikePageState extends State<_GuessYouLikePage> {
-
   @override
   Widget build(BuildContext context) {
     return ListView.builder(
@@ -103,7 +101,7 @@ class _ShoppingCard extends StatelessWidget {
     return Column(children: [
       const SizedBox(height: 25.0),
       getFoodItem(context, shoppingDish['foodName'], shoppingDish['foodUrl'],
-          shoppingDish['foodPrice'], shoppingDish['foodStoreName'], 5),
+          shoppingDish['foodPrice'], shoppingDish['foodStoreName']),
       const SizedBox(height: 25.0),
       Padding(
         padding: const EdgeInsets.only(left: 125.0),
@@ -113,7 +111,7 @@ class _ShoppingCard extends StatelessWidget {
   }
 
   Widget getFoodItem(BuildContext context, String dishName, String imgUrl,
-      String price, String canteen, int num) {
+      String price, String canteen) {
     return Padding(
         padding: const EdgeInsets.only(left: 15.0),
         child: Row(
@@ -162,14 +160,6 @@ class _ShoppingCard extends StatelessWidget {
                         color: Colors.grey,
                       ),
                     ),
-                    const SizedBox(width: 7.0),
-                    const Icon(Icons.one_x_mobiledata, color: Colors.grey),
-                    Text(
-                      num.toString(),
-                      style: const TextStyle(
-                        color: Colors.grey,
-                      ),
-                    )
                   ],
                 )
               ],

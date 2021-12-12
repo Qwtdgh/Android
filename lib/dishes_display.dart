@@ -41,18 +41,19 @@ class _HomePageState extends State<HomePage> {
 }
 
 class _HomeRoot extends StatefulWidget {
-
   @override
   _HomeRootState createState() => _HomeRootState();
 }
 
 class _HomeRootState extends State<_HomeRoot> {
   var topFoodList = [];
+
   getAll(BuildContext context) async {
     var baseUrl = "http://delivery.mcatk.com";
     var uri = "/api/getTopFoodList/";
     var body = {};
-    http.Response response = await http.post(Uri.parse(baseUrl + uri), body: convert.jsonEncode(body));
+    http.Response response = await http.post(Uri.parse(baseUrl + uri),
+        body: convert.jsonEncode(body));
     final statusCode = response.statusCode;
     final responseBody = response.body;
     var result = convert.jsonDecode(responseBody);
